@@ -14,7 +14,277 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          mood_label: string | null
+          mood_score: number | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          mood_label?: string | null
+          mood_score?: number | null
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          mood_label?: string | null
+          mood_score?: number | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          title: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          title?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_logs: {
+        Row: {
+          chats_count: number | null
+          created_at: string | null
+          exercises_count: number | null
+          id: string
+          journals_count: number | null
+          log_date: string
+          points_earned: number | null
+          user_id: string
+        }
+        Insert: {
+          chats_count?: number | null
+          created_at?: string | null
+          exercises_count?: number | null
+          id?: string
+          journals_count?: number | null
+          log_date?: string
+          points_earned?: number | null
+          user_id: string
+        }
+        Update: {
+          chats_count?: number | null
+          created_at?: string | null
+          exercises_count?: number | null
+          id?: string
+          journals_count?: number | null
+          log_date?: string
+          points_earned?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_entries: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          mood_label: string | null
+          mood_score: number | null
+          tags: string[] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          mood_label?: string | null
+          mood_score?: number | null
+          tags?: string[] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          mood_label?: string | null
+          mood_score?: number | null
+          tags?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_entries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mood_logs: {
+        Row: {
+          created_at: string | null
+          id: string
+          mood_label: string
+          mood_score: number
+          source: string
+          source_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          mood_label: string
+          mood_score: number
+          source: string
+          source_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          mood_label?: string
+          mood_score?: number
+          source?: string
+          source_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mood_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          current_streak: number | null
+          id: string
+          last_activity_date: string | null
+          longest_streak: number | null
+          total_points: number | null
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          current_streak?: number | null
+          id: string
+          last_activity_date?: string | null
+          longest_streak?: number | null
+          total_points?: number | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number | null
+          total_points?: number | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      therapy_exercises: {
+        Row: {
+          completed_at: string | null
+          duration_seconds: number | null
+          exercise_type: string
+          id: string
+          points_earned: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          duration_seconds?: number | null
+          exercise_type: string
+          id?: string
+          points_earned?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          duration_seconds?: number | null
+          exercise_type?: string
+          id?: string
+          points_earned?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "therapy_exercises_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
