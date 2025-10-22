@@ -1,136 +1,80 @@
 import { motion } from "framer-motion";
-import { BarChart3, TrendingUp, Heart, BookOpen, MessageCircle } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TrendingUp, Calendar, Heart, Sparkles, Award } from "lucide-react";
+import { AuthGate } from "@/components/AuthGate";
+import { useJournal } from "@/hooks/useJournal";
 
 const Dashboard = () => {
+  const { entries } = useJournal();
+
+  const stats = [
+    { title: "Journal Entries", value: entries.length, icon: Calendar, color: "text-primary", bgColor: "bg-primary/10" },
+    { title: "Wellness Points", value: entries.length * 10, icon: Sparkles, color: "text-secondary", bgColor: "bg-secondary/10" },
+    { title: "Current Streak", value: "3 days", icon: TrendingUp, color: "text-accent", bgColor: "bg-accent/10" },
+    { title: "Achievements", value: Math.floor(entries.length / 5), icon: Award, color: "text-support", bgColor: "bg-support/10" },
+  ];
+
+  const moodDistribution = entries.reduce((acc, entry) => {
+    acc[entry.mood_label] = (acc[entry.mood_label] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
   return (
-    <div className="min-h-screen pt-16 bg-gradient-calm">
-      <div className="container mx-auto px-4 py-12">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h1 className="font-display text-3xl font-bold mb-2">Your Wellness Insights</h1>
-          <p className="text-muted-foreground">
-            Track your emotional journey and celebrate your progress
-          </p>
-        </motion.div>
-
-        {/* Stats Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {[
-            {
-              icon: MessageCircle,
-              label: "Conversations",
-              value: "12",
-              change: "+3 this week",
-              color: "text-primary"
-            },
-            {
-              icon: BookOpen,
-              label: "Journal Entries",
-              value: "8",
-              change: "+2 this week",
-              color: "text-accent"
-            },
-            {
-              icon: TrendingUp,
-              label: "Mood Trend",
-              value: "Improving",
-              change: "+15% this month",
-              color: "text-secondary"
-            }
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="glass p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <stat.icon className={`w-8 h-8 ${stat.color}`} />
-                  <span className="text-xs text-secondary font-medium">{stat.change}</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
-                <p className="font-display text-3xl font-bold">{stat.value}</p>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Mood Chart Placeholder */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <Card className="glass p-8">
-            <div className="flex items-center gap-2 mb-6">
-              <BarChart3 className="w-6 h-6 text-primary" />
-              <h2 className="font-display text-2xl font-semibold">Mood Timeline</h2>
+    <AuthGate>
+      <div className="min-h-screen pt-16 bg-gradient-calm">
+        <div className="container mx-auto px-4 py-12">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 text-center">
+            <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-4">
+              <Heart className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Your Wellness Journey</span>
             </div>
-            
-            <div className="h-64 flex items-center justify-center border-2 border-dashed border-border rounded-lg">
-              <div className="text-center">
-                <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground">
-                  Your mood insights will appear here as you use Lovable
-                </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Keep journaling and chatting with Luna to see patterns emerge
-                </p>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
+            <h1 className="font-display text-3xl font-bold mb-2">Dashboard</h1>
+            <p className="text-muted-foreground">Track your progress and celebrate your growth</p>
+          </motion.div>
 
-        {/* Recent Activity */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mt-8"
-        >
-          <h2 className="font-display text-2xl font-semibold mb-4">Recent Reflections</h2>
-          <div className="space-y-4">
-            {[
-              {
-                type: "journal",
-                content: "Feeling more at peace today after our conversation...",
-                time: "2 hours ago"
-              },
-              {
-                type: "chat",
-                content: "Talked through some anxious thoughts with Luna",
-                time: "Yesterday"
-              },
-              {
-                type: "journal",
-                content: "Grateful for small moments of joy today",
-                time: "2 days ago"
-              }
-            ].map((activity, index) => (
-              <Card key={index} className="glass p-4 hover:glow transition-all cursor-pointer">
-                <div className="flex items-start gap-4">
-                  {activity.type === "journal" ? (
-                    <BookOpen className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-                  ) : (
-                    <MessageCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-foreground/80 truncate">{activity.content}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{activity.time}</p>
-                  </div>
-                </div>
-              </Card>
+          <div className="grid md:grid-cols-4 gap-6 mb-8">
+            {stats.map((stat, idx) => (
+              <motion.div key={stat.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }}>
+                <Card className="glass hover:shadow-lg transition-all">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">{stat.title}</p>
+                        <p className="text-3xl font-bold">{stat.value}</p>
+                      </div>
+                      <div className={`p-3 rounded-full ${stat.bgColor}`}>
+                        <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
-        </motion.div>
+
+          <Card className="glass">
+            <CardHeader><CardTitle>Mood Distribution</CardTitle></CardHeader>
+            <CardContent>
+              {Object.keys(moodDistribution).length > 0 ? (
+                <div className="space-y-3">
+                  {Object.entries(moodDistribution).map(([mood, count]) => (
+                    <div key={mood}>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-sm capitalize">{mood}</span>
+                        <span className="text-sm text-muted-foreground">{count}</span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${(count / entries.length) * 100}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : <p className="text-muted-foreground text-center py-8">Start journaling to see your mood trends</p>}
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </AuthGate>
   );
 };
 

@@ -1,1 +1,7 @@
 project_id = "lqmlradyrdzrqdbinmlb"
+
+[functions.chat]
+verify_jwt = false
+
+[functions.analyze-mood]
+verify_jwt = false

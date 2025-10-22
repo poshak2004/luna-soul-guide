@@ -8,60 +8,60 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Therapeutic Color System - Warm, Safe, Calming */
-    --background: 270 40% 98%;
-    --foreground: 270 20% 20%;
+    /* Serene Ocean & Sky Color System - Calming, Peaceful, Tranquil */
+    --background: 200 30% 98%;
+    --foreground: 200 20% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 270 20% 20%;
+    --card-foreground: 200 20% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 270 20% 20%;
+    --popover-foreground: 200 20% 20%;
 
-    /* Lavender - Primary (empathy, calm) */
-    --primary: 270 60% 75%;
-    --primary-foreground: 270 60% 15%;
-    --primary-light: 270 70% 90%;
-    --primary-glow: 270 70% 85%;
+    /* Ocean Blue - Primary (calm, trust, depth) */
+    --primary: 200 65% 70%;
+    --primary-foreground: 200 70% 15%;
+    --primary-light: 200 60% 88%;
+    --primary-glow: 200 65% 82%;
 
-    /* Mint - Secondary (growth, healing) */
-    --secondary: 140 50% 80%;
-    --secondary-foreground: 140 60% 20%;
-    --secondary-light: 140 60% 92%;
+    /* Soft Teal - Secondary (balance, renewal) */
+    --secondary: 175 45% 75%;
+    --secondary-foreground: 175 60% 22%;
+    --secondary-light: 175 50% 90%;
 
-    /* Blush - Accent (warmth, care) */
-    --accent: 350 100% 88%;
-    --accent-foreground: 350 60% 25%;
+    /* Sage Green - Accent (peace, growth) */
+    --accent: 140 30% 75%;
+    --accent-foreground: 140 45% 25%;
     
-    /* Soft Blue - Support */
-    --support: 200 70% 85%;
-    --support-foreground: 200 60% 25%;
+    /* Sky Blue - Support */
+    --support: 210 70% 85%;
+    --support-foreground: 210 60% 25%;
 
-    --muted: 270 30% 95%;
-    --muted-foreground: 270 15% 45%;
+    --muted: 200 25% 95%;
+    --muted-foreground: 200 15% 45%;
 
-    --destructive: 0 70% 65%;
+    --destructive: 0 60% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 270 25% 90%;
-    --input: 270 25% 90%;
-    --ring: 270 60% 75%;
+    --border: 200 20% 92%;
+    --input: 200 20% 92%;
+    --ring: 200 65% 70%;
 
     --radius: 1rem;
 
-    /* Therapeutic Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(270, 70%, 90%), hsl(200, 70%, 90%), hsl(140, 60%, 92%));
-    --gradient-card: linear-gradient(135deg, hsl(0, 0%, 100%), hsl(270, 40%, 98%));
-    --gradient-calm: linear-gradient(180deg, hsl(270, 40%, 98%), hsl(200, 50%, 95%));
+    /* Serene Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(200, 60%, 88%), hsl(210, 70%, 90%), hsl(175, 50%, 90%));
+    --gradient-card: linear-gradient(135deg, hsl(0, 0%, 100%), hsl(200, 30%, 97%));
+    --gradient-calm: linear-gradient(180deg, hsl(200, 30%, 98%), hsl(210, 40%, 95%));
     
     /* Glassmorphism */
     --glass-bg: hsla(0, 0%, 100%, 0.7);
-    --glass-border: hsla(270, 60%, 75%, 0.2);
+    --glass-border: hsla(200, 65%, 70%, 0.2);
     
     /* Soft Shadows */
-    --shadow-soft: 0 4px 24px hsla(270, 60%, 75%, 0.15);
-    --shadow-card: 0 2px 16px hsla(270, 40%, 60%, 0.1);
-    --shadow-glow: 0 0 40px hsla(270, 70%, 85%, 0.3);
+    --shadow-soft: 0 4px 24px hsla(200, 60%, 70%, 0.15);
+    --shadow-card: 0 2px 16px hsla(200, 40%, 60%, 0.1);
+    --shadow-glow: 0 0 40px hsla(200, 65%, 82%, 0.3);
 
     /* Transitions */
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -69,50 +69,50 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 270 30% 12%;
-    --foreground: 270 20% 95%;
+    --background: 200 25% 12%;
+    --foreground: 200 15% 95%;
 
-    --card: 270 25% 15%;
-    --card-foreground: 270 20% 95%;
+    --card: 200 20% 15%;
+    --card-foreground: 200 15% 95%;
 
-    --popover: 270 25% 15%;
-    --popover-foreground: 270 20% 95%;
+    --popover: 200 20% 15%;
+    --popover-foreground: 200 15% 95%;
 
-    --primary: 270 60% 70%;
-    --primary-foreground: 270 60% 95%;
-    --primary-light: 270 50% 30%;
-    --primary-glow: 270 60% 40%;
+    --primary: 200 60% 65%;
+    --primary-foreground: 200 60% 95%;
+    --primary-light: 200 45% 30%;
+    --primary-glow: 200 55% 40%;
 
-    --secondary: 140 40% 60%;
-    --secondary-foreground: 140 60% 95%;
-    --secondary-light: 140 30% 25%;
+    --secondary: 175 35% 60%;
+    --secondary-foreground: 175 50% 95%;
+    --secondary-light: 175 25% 25%;
 
-    --accent: 350 80% 70%;
-    --accent-foreground: 350 80% 95%;
+    --accent: 140 25% 65%;
+    --accent-foreground: 140 35% 95%;
     
-    --support: 200 50% 60%;
-    --support-foreground: 200 50% 95%;
+    --support: 210 45% 60%;
+    --support-foreground: 210 50% 95%;
 
-    --muted: 270 20% 20%;
-    --muted-foreground: 270 15% 65%;
+    --muted: 200 15% 20%;
+    --muted-foreground: 200 10% 65%;
 
-    --destructive: 0 70% 60%;
+    --destructive: 0 60% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 270 20% 25%;
-    --input: 270 20% 25%;
-    --ring: 270 60% 70%;
+    --border: 200 15% 25%;
+    --input: 200 15% 25%;
+    --ring: 200 60% 65%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(270, 40%, 20%), hsl(200, 40%, 20%), hsl(140, 30%, 20%));
-    --gradient-card: linear-gradient(135deg, hsl(270, 25%, 15%), hsl(270, 30%, 18%));
-    --gradient-calm: linear-gradient(180deg, hsl(270, 30%, 12%), hsl(200, 30%, 15%));
+    --gradient-hero: linear-gradient(135deg, hsl(200, 35%, 18%), hsl(210, 35%, 20%), hsl(175, 25%, 18%));
+    --gradient-card: linear-gradient(135deg, hsl(200, 20%, 15%), hsl(200, 25%, 18%));
+    --gradient-calm: linear-gradient(180deg, hsl(200, 25%, 12%), hsl(210, 25%, 15%));
     
-    --glass-bg: hsla(270, 25%, 15%, 0.7);
-    --glass-border: hsla(270, 60%, 70%, 0.2);
+    --glass-bg: hsla(200, 20%, 15%, 0.7);
+    --glass-border: hsla(200, 60%, 65%, 0.2);
     
-    --shadow-soft: 0 4px 24px hsla(270, 60%, 20%, 0.3);
-    --shadow-card: 0 2px 16px hsla(270, 40%, 10%, 0.3);
-    --shadow-glow: 0 0 40px hsla(270, 60%, 30%, 0.3);
+    --shadow-soft: 0 4px 24px hsla(200, 55%, 20%, 0.3);
+    --shadow-card: 0 2px 16px hsla(200, 35%, 10%, 0.3);
+    --shadow-glow: 0 0 40px hsla(200, 55%, 30%, 0.3);
   }
 }
 

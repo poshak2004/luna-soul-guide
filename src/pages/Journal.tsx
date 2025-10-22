@@ -1,16 +1,21 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { BookHeart, Save, Sparkles } from "lucide-react";
+import { BookHeart, Save, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useJournal } from "@/hooks/useJournal";
+import { AuthGate } from "@/components/AuthGate";
 
 const Journal = () => {
   const [entry, setEntry] = useState("");
+  const [mood, setMood] = useState("neutral");
+  const { entries, saveEntry, deleteEntry } = useJournal();
   const { toast } = useToast();
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!entry.trim()) {
       toast({
         title: "Empty entry",
@@ -20,24 +25,23 @@ const Journal = () => {
       return;
     }
 
-    // Save to localStorage for now (will connect to backend later)
-    const entries = JSON.parse(localStorage.getItem("journal_entries") || "[]");
-    entries.push({
-      id: Date.now(),
-      content: entry,
-      date: new Date().toISOString()
-    });
-    localStorage.setItem("journal_entries", JSON.stringify(entries));
-
-    toast({
-      title: "Entry saved",
-      description: "Your thoughts are safely stored 💜",
-    });
-
+    const moodScore = { happy: 8, calm: 7, neutral: 5, anxious: 3, sad: 2, stressed: 3 }[mood] || 5;
+    await saveEntry(entry, mood, moodScore);
     setEntry("");
+    setMood("neutral");
   };
 
+  const moodOptions = [
+    { value: "happy", label: "😊 Happy", color: "text-yellow-500" },
+    { value: "calm", label: "😌 Calm", color: "text-blue-500" },
+    { value: "neutral", label: "😐 Neutral", color: "text-gray-500" },
+    { value: "anxious", label: "😰 Anxious", color: "text-orange-500" },
+    { value: "sad", label: "😢 Sad", color: "text-blue-600" },
+    { value: "stressed", label: "😫 Stressed", color: "text-red-500" },
+  ];
+
   return (
+    <AuthGate>
     <div className="min-h-screen pt-16 bg-gradient-calm">
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         {/* Header */}
@@ -75,6 +79,18 @@ const Journal = () => {
                   })}
                 </p>
               </div>
+              <Select value={mood} onValueChange={setMood}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {moodOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <span className={option.color}>{option.label}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <Textarea
@@ -100,35 +116,45 @@ const Journal = () => {
           </Card>
         </motion.div>
 
-        {/* Prompts */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mt-8"
-        >
-          <h3 className="font-display text-lg font-semibold mb-4">Writing prompts</h3>
-          <div className="grid md:grid-cols-2 gap-4">
-            {[
-              "What am I grateful for today?",
-              "What challenged me, and how did I respond?",
-              "What would I tell a friend in my situation?",
-              "What small win can I celebrate today?"
-            ].map((prompt, index) => (
-              <Card
-                key={index}
-                className="p-4 glass cursor-pointer hover:glow transition-all group"
-                onClick={() => setEntry(entry + (entry ? "\n\n" : "") + prompt + "\n")}
-              >
-                <p className="text-sm group-hover:text-primary transition-colors">
-                  {prompt}
-                </p>
-              </Card>
-            ))}
-          </div>
-        </motion.div>
+        {/* Previous Entries */}
+        {entries.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mt-8"
+          >
+            <h3 className="font-display text-lg font-semibold mb-4">Previous Entries</h3>
+            <div className="space-y-4">
+              {entries.slice(0, 5).map((e, index) => (
+                <Card key={e.id} className="glass p-4 hover:shadow-lg transition-all group">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(e.created_at).toLocaleDateString()}
+                      </p>
+                      <span className="text-2xl">
+                        {moodOptions.find(m => m.value === e.mood_label)?.label.split(' ')[0] || '😐'}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteEntry(e.id)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <p className="text-sm line-clamp-2">{e.content}</p>
+                </Card>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
+    </AuthGate>
   );
 };
 

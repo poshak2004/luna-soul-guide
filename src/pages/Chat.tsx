@@ -1,62 +1,29 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Send, Mic, Heart, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-}
+import { useChat } from "@/hooks/useChat";
+import { AuthGate } from "@/components/AuthGate";
 
 const Chat = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content: "Hi there 💜 I'm Luna, your companion in this space. I'm here to listen without judgment and support you however you need. How are you feeling today?",
-      timestamp: new Date()
-    }
-  ]);
+  const { messages, sendMessage, isLoading } = useChat();
   const [input, setInput] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const handleSend = () => {
-    if (!input.trim()) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: input,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
+    if (!input.trim() || isLoading) return;
+    sendMessage(input);
     setInput("");
-
-    // Simulate Luna's response (will be replaced with AI later)
-    setTimeout(() => {
-      const responses = [
-        "I hear you. That sounds really challenging. Would you like to tell me more about what you're experiencing?",
-        "Thank you for sharing that with me. Your feelings are completely valid. What do you think would help you feel better right now?",
-        "I'm glad you're opening up about this. It takes courage to express these feelings. How long have you been feeling this way?",
-        "That's a lot to carry. Remember, you're not alone in this. What kind of support would be most helpful for you right now?",
-      ];
-      
-      const lunaMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: responses[Math.floor(Math.random() * responses.length)],
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, lunaMessage]);
-    }, 1000);
   };
 
   return (
+    <AuthGate>
     <div className="min-h-screen pt-16 bg-gradient-calm">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
@@ -77,6 +44,11 @@ const Chat = () => {
         <Card className="glass h-[600px] flex flex-col overflow-hidden">
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            {messages.length === 0 && (
+              <div className="text-center text-muted-foreground py-8">
+                <p>Start a conversation with Luna...</p>
+              </div>
+            )}
             {messages.map((message, index) => (
               <motion.div
                 key={message.id}
@@ -98,13 +70,25 @@ const Chat = () => {
                       <span className="text-xs font-semibold text-primary">Luna</span>
                     </div>
                   )}
-                  <p className="leading-relaxed">{message.content}</p>
+                  <p className="leading-relaxed whitespace-pre-wrap">{message.content}</p>
                   <span className="text-xs opacity-70 mt-2 block">
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               </motion.div>
             ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-card border border-border rounded-2xl p-4">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Input Area */}
@@ -114,19 +98,21 @@ const Chat = () => {
                 placeholder="Share what's on your mind..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
                 className="flex-1 bg-background border-border/50"
+                disabled={isLoading}
               />
               <Button
                 variant="outline"
                 size="icon"
                 className="border-border/50 hover:bg-primary/10"
+                disabled
               >
                 <Mic className="w-5 h-5" />
               </Button>
               <Button
                 onClick={handleSend}
-                disabled={!input.trim()}
+                disabled={!input.trim() || isLoading}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <Send className="w-5 h-5" />
@@ -165,6 +151,7 @@ const Chat = () => {
         </motion.div>
       </div>
     </div>
+    </AuthGate>
   );
 };
 
