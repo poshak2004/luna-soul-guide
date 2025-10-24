@@ -1,16 +1,27 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Send, Mic, Heart, Sparkles } from "lucide-react";
+import { Send, Mic, MicOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useChat } from "@/hooks/useChat";
+import { useVoiceInput } from "@/hooks/useVoiceInput";
 import { AuthGate } from "@/components/AuthGate";
+import { Logo } from "@/components/Logo";
+import { useToast } from "@/hooks/use-toast";
 
 const Chat = () => {
   const { messages, sendMessage, isLoading } = useChat();
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+
+  const { isListening, isSupported, toggleListening } = useVoiceInput({
+    onTranscript: (text) => {
+      setInput((prev) => prev + " " + text);
+    },
+    continuous: false,
+  });
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -20,6 +31,18 @@ const Chat = () => {
     if (!input.trim() || isLoading) return;
     sendMessage(input);
     setInput("");
+  };
+
+  const handleVoiceClick = () => {
+    if (!isSupported) {
+      toast({
+        title: "Not Supported",
+        description: "Voice input is not supported in your browser.",
+        variant: "destructive",
+      });
+      return;
+    }
+    toggleListening();
   };
 
   return (
@@ -32,10 +55,9 @@ const Chat = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Heart className="w-8 h-8 text-primary fill-primary" />
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <Logo size="lg" />
             <h1 className="font-display text-3xl font-bold">Chat with Luna</h1>
-            <Sparkles className="w-6 h-6 text-accent animate-pulse-gentle" />
           </div>
           <p className="text-muted-foreground">Your safe space for honest conversation</p>
         </motion.div>
@@ -66,7 +88,7 @@ const Chat = () => {
                 >
                   {message.role === "assistant" && (
                     <div className="flex items-center gap-2 mb-2">
-                      <Heart className="w-4 h-4 text-primary fill-primary" />
+                      <Logo size="sm" />
                       <span className="text-xs font-semibold text-primary">Luna</span>
                     </div>
                   )}
@@ -105,10 +127,17 @@ const Chat = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="border-border/50 hover:bg-primary/10"
-                disabled
+                onClick={handleVoiceClick}
+                className={`border-border/50 ${
+                  isListening ? "bg-destructive/20 hover:bg-destructive/30" : "hover:bg-primary/10"
+                }`}
+                disabled={!isSupported}
               >
-                <Mic className="w-5 h-5" />
+                {isListening ? (
+                  <MicOff className="w-5 h-5 animate-pulse text-destructive" />
+                ) : (
+                  <Mic className="w-5 h-5" />
+                )}
               </Button>
               <Button
                 onClick={handleSend}

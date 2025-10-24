@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          name: string
+          points_required: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon: string
+          id?: string
+          name: string
+          points_required: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          name?: string
+          points_required?: number
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -285,12 +312,95 @@ export type Database = {
           },
         ]
       }
+      user_activities: {
+        Row: {
+          activity_type: string
+          completed_at: string
+          id: string
+          points_earned: number | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          completed_at?: string
+          id?: string
+          points_earned?: number | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          completed_at?: string
+          id?: string
+          points_earned?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          anonymous_username: string
+          created_at: string
+          current_streak: number | null
+          id: string
+          total_points: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          anonymous_username: string
+          created_at?: string
+          current_streak?: number | null
+          id?: string
+          total_points?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          anonymous_username?: string
+          created_at?: string
+          current_streak?: number | null
+          id?: string
+          total_points?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_anonymous_username: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never

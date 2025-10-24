@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
-import { MessageCircle, BookHeart, BarChart3, Heart, Sparkles, Globe, Users, Leaf } from "lucide-react";
+import { MessageCircle, BookHeart, BarChart3, Sparkles, Globe, Users, Leaf, Dumbbell, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Logo } from "@/components/Logo";
 
 const Landing = () => {
   return (
@@ -30,8 +31,8 @@ const Landing = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="flex justify-center mb-6"
             >
-              <div className="relative">
-                <Heart className="w-20 h-20 text-primary fill-primary glow" />
+              <div className="relative glow">
+                <Logo size="lg" className="w-24 h-24" />
                 <Sparkles className="w-8 h-8 text-accent absolute -top-2 -right-2 animate-pulse-gentle" />
               </div>
             </motion.div>
@@ -115,28 +116,35 @@ const Landing = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {[
               {
                 icon: MessageCircle,
-                title: "Chat with Luna",
-                description: "24/7 empathetic AI companion who listens without judgment and helps you process emotions.",
+                title: "AI Chat Companion",
+                description: "Talk with Luna using text or voice. Available 24/7 for emotional support.",
                 color: "text-primary",
                 link: "/chat"
               },
               {
                 icon: BookHeart,
                 title: "Private Journal",
-                description: "Write freely in your encrypted space. Luna helps you find patterns and insights in your thoughts.",
+                description: "Encrypted journaling space with mood tracking and AI insights.",
                 color: "text-accent",
                 link: "/journal"
               },
               {
-                icon: BarChart3,
-                title: "Mood Insights",
-                description: "Track your emotional journey with beautiful visualizations and AI-powered trend analysis.",
+                icon: Dumbbell,
+                title: "Wellness Exercises",
+                description: "Guided breathing, meditation, and therapy exercises. Earn points!",
                 color: "text-secondary",
-                link: "/dashboard"
+                link: "/exercises"
+              },
+              {
+                icon: Trophy,
+                title: "Social Ranking",
+                description: "Compete anonymously, earn badges, and climb the leaderboard.",
+                color: "text-support",
+                link: "/leaderboard"
               }
             ].map((feature, index) => (
               <motion.div
@@ -213,7 +221,7 @@ const Landing = () => {
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {[
               {
-                icon: Heart,
+                icon: Globe,
                 sdg: "SDG 3",
                 title: "Good Health & Well-being",
                 description: "Promoting mental health awareness and early emotional support"

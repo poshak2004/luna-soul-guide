@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { BookHeart, Save, Sparkles, Trash2 } from "lucide-react";
+import { BookHeart, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useJournal } from "@/hooks/useJournal";
 import { AuthGate } from "@/components/AuthGate";
+import { Logo } from "@/components/Logo";
 
 const Journal = () => {
   const [entry, setEntry] = useState("");
@@ -50,10 +51,10 @@ const Journal = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <div className="flex items-center justify-center gap-2 mb-2">
+          <div className="flex items-center justify-center gap-3 mb-2">
             <BookHeart className="w-8 h-8 text-accent" />
             <h1 className="font-display text-3xl font-bold">Your Private Journal</h1>
-            <Sparkles className="w-6 h-6 text-primary animate-pulse-gentle" />
+            <Logo size="md" />
           </div>
           <p className="text-muted-foreground">
             A safe space to process your thoughts and emotions

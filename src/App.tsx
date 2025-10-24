@@ -10,6 +10,8 @@ import Onboarding from "./pages/Onboarding";
 import Journal from "./pages/Journal";
 import Dashboard from "./pages/Dashboard";
 import Crisis from "./pages/Crisis";
+import Exercises from "./pages/Exercises";
+import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/chat" element={<Chat />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/journal" element={<Journal />} />
+          <Route path="/exercises" element={<Exercises />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/crisis" element={<Crisis />} />
           <Route path="*" element={<NotFound />} />

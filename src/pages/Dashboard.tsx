@@ -1,17 +1,20 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Calendar, Heart, Sparkles, Award } from "lucide-react";
+import { TrendingUp, Calendar, Sparkles, Award } from "lucide-react";
 import { AuthGate } from "@/components/AuthGate";
 import { useJournal } from "@/hooks/useJournal";
+import { useGamification } from "@/hooks/useGamification";
+import { Logo } from "@/components/Logo";
 
 const Dashboard = () => {
   const { entries } = useJournal();
+  const { profile, userBadges } = useGamification();
 
   const stats = [
     { title: "Journal Entries", value: entries.length, icon: Calendar, color: "text-primary", bgColor: "bg-primary/10" },
-    { title: "Wellness Points", value: entries.length * 10, icon: Sparkles, color: "text-secondary", bgColor: "bg-secondary/10" },
-    { title: "Current Streak", value: "3 days", icon: TrendingUp, color: "text-accent", bgColor: "bg-accent/10" },
-    { title: "Achievements", value: Math.floor(entries.length / 5), icon: Award, color: "text-support", bgColor: "bg-support/10" },
+    { title: "Wellness Points", value: profile?.total_points || 0, icon: Sparkles, color: "text-secondary", bgColor: "bg-secondary/10" },
+    { title: "Current Streak", value: `${profile?.current_streak || 0} days`, icon: TrendingUp, color: "text-accent", bgColor: "bg-accent/10" },
+    { title: "Badges Earned", value: userBadges.length, icon: Award, color: "text-support", bgColor: "bg-support/10" },
   ];
 
   const moodDistribution = entries.reduce((acc, entry) => {
@@ -24,11 +27,10 @@ const Dashboard = () => {
       <div className="min-h-screen pt-16 bg-gradient-calm">
         <div className="container mx-auto px-4 py-12">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-4">
-              <Heart className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Your Wellness Journey</span>
+            <div className="inline-flex items-center gap-3 mb-4">
+              <Logo size="md" />
+              <h1 className="font-display text-3xl font-bold">Dashboard</h1>
             </div>
-            <h1 className="font-display text-3xl font-bold mb-2">Dashboard</h1>
             <p className="text-muted-foreground">Track your progress and celebrate your growth</p>
           </motion.div>
 
