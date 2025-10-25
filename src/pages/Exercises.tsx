@@ -7,13 +7,16 @@ import { Progress } from "@/components/ui/progress";
 import { AuthGate } from "@/components/AuthGate";
 import { useGamification } from "@/hooks/useGamification";
 import { Logo } from "@/components/Logo";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Exercises = () => {
   const [activeExercise, setActiveExercise] = useState<string | null>(null);
   const [breathPhase, setBreathPhase] = useState<"inhale" | "hold" | "exhale">("inhale");
   const [breathCount, setBreathCount] = useState(0);
   const [isBreathing, setIsBreathing] = useState(false);
-  const { addActivity } = useGamification();
+  const { refreshProfile } = useGamification();
+  const { toast } = useToast();
 
   const exercises = [
     {
@@ -60,7 +63,7 @@ const Exercises = () => {
     breathingCycle();
   };
 
-  const breathingCycle = () => {
+  const breathingCycle = async () => {
     const phases: Array<"inhale" | "hold" | "exhale"> = ["inhale", "hold", "exhale", "hold"];
     let currentPhaseIndex = 0;
     let cycles = 0;
@@ -76,15 +79,59 @@ const Exercises = () => {
         if (cycles >= 4) {
           clearInterval(interval);
           setIsBreathing(false);
-          addActivity("breathing_exercise", 10);
+          completeExercise("breathing");
         }
       }
     }, 4000);
   };
 
-  const completeExercise = (exerciseId: string, points: number) => {
-    addActivity(`${exerciseId}_exercise`, points);
-    setActiveExercise(null);
+  const completeExercise = async (exerciseId: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    try {
+      // Use server-side exercise validation
+      const { data, error } = await supabase.rpc('complete_exercise', {
+        _user_id: user.id,
+        _exercise_type: `${exerciseId}_exercise`,
+      });
+
+      if (error) throw error;
+
+      // Check for new badges
+      const badgeResult = await supabase.rpc('check_and_award_badges', {
+        _user_id: user.id,
+      });
+
+      // Show notifications
+      const result = data as any;
+      if (result?.success) {
+        toast({
+          title: `+${result.points_earned} points!`,
+          description: `You earned ${result.points_earned} wellness points`,
+        });
+      }
+
+      const badgeData = badgeResult.data as any;
+      if (badgeData?.awarded_badges && badgeData.awarded_badges.length > 0) {
+        badgeData.awarded_badges.forEach((badge: any) => {
+          toast({
+            title: '🏆 New Badge Unlocked!',
+            description: `You earned the "${badge.name}" badge!`,
+          });
+        });
+      }
+
+      setActiveExercise(null);
+      await refreshProfile();
+    } catch (error: any) {
+      console.error('Error completing exercise:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to complete exercise',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -221,12 +268,12 @@ const Exercises = () => {
                         </div>
                       ))}
                       <div className="flex gap-4 pt-4">
-                        <Button
-                          className="flex-1"
-                          onClick={() => completeExercise("grounding", 10)}
-                        >
-                          Complete Exercise
-                        </Button>
+                      <Button
+                        className="flex-1"
+                        onClick={() => completeExercise("grounding")}
+                      >
+                        Complete Exercise
+                      </Button>
                         <Button variant="outline" onClick={() => setActiveExercise(null)}>
                           <RotateCcw className="w-4 h-4 mr-2" />
                           Back
@@ -260,7 +307,7 @@ const Exercises = () => {
                       <Button
                         size="lg"
                         className="w-full"
-                        onClick={() => completeExercise(activeExercise, activeExercise === "meditation" ? 15 : 20)}
+                        onClick={() => completeExercise(activeExercise)}
                       >
                         Complete Exercise
                       </Button>

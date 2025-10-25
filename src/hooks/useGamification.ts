@@ -62,70 +62,61 @@ export const useGamification = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Add activity
-    const { error: activityError } = await supabase
-      .from('user_activities')
-      .insert({
-        user_id: user.id,
-        activity_type: activityType,
-        points_earned: points,
+    try {
+      // Use server-side atomic point addition
+      const { data, error } = await supabase.rpc('add_user_points', {
+        _user_id: user.id,
+        _activity_type: activityType,
+        _points: points,
       });
 
-    if (activityError) {
-      console.error('Error adding activity:', activityError);
-      return;
+      if (error) throw error;
+
+      // Check for new badges
+      await checkAndAwardBadges();
+
+      // Refresh profile
+      await fetchProfile();
+
+      toast({
+        title: `+${points} points!`,
+        description: `You earned ${points} wellness points`,
+      });
+    } catch (error: any) {
+      console.error('Error adding activity:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to add activity',
+        variant: 'destructive',
+      });
     }
-
-    // Update total points
-    const newTotalPoints = (profile?.total_points || 0) + points;
-    const { error: updateError } = await supabase
-      .from('user_profiles')
-      .update({ total_points: newTotalPoints })
-      .eq('user_id', user.id);
-
-    if (updateError) {
-      console.error('Error updating points:', updateError);
-      return;
-    }
-
-    // Check for new badges
-    await checkAndAwardBadges(newTotalPoints);
-
-    // Refresh profile
-    await fetchProfile();
-
-    toast({
-      title: `+${points} points!`,
-      description: `You earned ${points} wellness points`,
-    });
   };
 
-  const checkAndAwardBadges = async (totalPoints: number) => {
+  const checkAndAwardBadges = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    for (const badge of badges) {
-      if (totalPoints >= badge.points_required) {
-        // Check if user already has this badge
-        const hasBadge = userBadges.some((ub) => ub.badge_id === badge.id);
-        
-        if (!hasBadge) {
-          const { error } = await supabase
-            .from('user_badges')
-            .insert({
-              user_id: user.id,
-              badge_id: badge.id,
-            });
+    try {
+      // Use server-side badge validation
+      const { data, error } = await supabase.rpc('check_and_award_badges', {
+        _user_id: user.id,
+      });
 
-          if (!error) {
-            toast({
-              title: '🏆 New Badge Unlocked!',
-              description: `You earned the "${badge.name}" badge!`,
-            });
-            await fetchUserBadges();
-          }
-        }
+      if (error) throw error;
+
+      // Show notifications for newly awarded badges
+      const result = data as any;
+      if (result?.awarded_badges && result.awarded_badges.length > 0) {
+        result.awarded_badges.forEach((badge: any) => {
+          toast({
+            title: '🏆 New Badge Unlocked!',
+            description: `You earned the "${badge.name}" badge!`,
+          });
+        });
+        await fetchUserBadges();
       }
+    } catch (error: any) {
+      console.error('Error checking badges:', error);
     }
   };
 

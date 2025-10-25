@@ -400,7 +400,37 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_user_points: {
+        Args: { _activity_type: string; _points: number; _user_id: string }
+        Returns: Json
+      }
+      check_and_award_badges: { Args: { _user_id: string }; Returns: Json }
+      complete_exercise: {
+        Args: { _exercise_type: string; _user_id: string }
+        Returns: Json
+      }
       generate_anonymous_username: { Args: never; Returns: string }
+      get_leaderboard: {
+        Args: never
+        Returns: {
+          anonymous_username: string
+          current_streak: number
+          id: string
+          total_points: number
+        }[]
+      }
+      get_my_profile: {
+        Args: never
+        Returns: {
+          anonymous_username: string
+          created_at: string
+          current_streak: number
+          id: string
+          total_points: number
+          updated_at: string
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

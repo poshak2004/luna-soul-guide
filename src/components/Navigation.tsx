@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, BookHeart, BarChart3, LifeBuoy, Sparkles } from "lucide-react";
+import { Heart, MessageCircle, BookHeart, BarChart3, LifeBuoy, Sparkles, Trophy, Dumbbell } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +15,7 @@ const Navigation = () => {
             <Heart className="w-8 h-8 text-primary fill-primary group-hover:scale-110 transition-transform duration-300" />
             <Sparkles className="w-4 h-4 text-accent absolute -top-1 -right-1 animate-pulse-gentle" />
           </div>
-          <span className="font-display font-bold text-xl text-foreground">Lovable</span>
+          <span className="font-display font-bold text-xl text-foreground">MindfulMe</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-6">
@@ -44,6 +44,24 @@ const Navigation = () => {
           >
             <BookHeart className="w-4 h-4 inline mr-1" />
             Journal
+          </Link>
+          <Link 
+            to="/exercises" 
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              isActive('/exercises') ? 'text-primary' : 'text-foreground/70'
+            }`}
+          >
+            <Dumbbell className="w-4 h-4 inline mr-1" />
+            Exercises
+          </Link>
+          <Link 
+            to="/leaderboard" 
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              isActive('/leaderboard') ? 'text-primary' : 'text-foreground/70'
+            }`}
+          >
+            <Trophy className="w-4 h-4 inline mr-1" />
+            Leaderboard
           </Link>
           <Link 
             to="/dashboard" 
