@@ -21,25 +21,25 @@ const Navigation = () => {
         <div className="hidden md:flex items-center gap-6">
           <Link 
             to="/" 
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              isActive('/') ? 'text-primary' : 'text-foreground/70'
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/') ? 'text-primary font-semibold' : 'text-foreground/70'
             }`}
           >
             Home
           </Link>
           <Link 
             to="/chat" 
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              isActive('/chat') ? 'text-primary' : 'text-foreground/70'
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/chat') ? 'text-primary font-semibold' : 'text-foreground/70'
             }`}
           >
             <MessageCircle className="w-4 h-4 inline mr-1" />
-            Chat with Luna
+            Chat
           </Link>
           <Link 
             to="/journal" 
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              isActive('/journal') ? 'text-primary' : 'text-foreground/70'
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/journal') ? 'text-primary font-semibold' : 'text-foreground/70'
             }`}
           >
             <BookHeart className="w-4 h-4 inline mr-1" />
@@ -47,8 +47,8 @@ const Navigation = () => {
           </Link>
           <Link 
             to="/exercises" 
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              isActive('/exercises') ? 'text-primary' : 'text-foreground/70'
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/exercises') ? 'text-primary font-semibold' : 'text-foreground/70'
             }`}
           >
             <Dumbbell className="w-4 h-4 inline mr-1" />
@@ -56,8 +56,8 @@ const Navigation = () => {
           </Link>
           <Link 
             to="/leaderboard" 
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              isActive('/leaderboard') ? 'text-primary' : 'text-foreground/70'
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/leaderboard') ? 'text-primary font-semibold' : 'text-foreground/70'
             }`}
           >
             <Trophy className="w-4 h-4 inline mr-1" />
@@ -65,8 +65,8 @@ const Navigation = () => {
           </Link>
           <Link 
             to="/dashboard" 
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              isActive('/dashboard') ? 'text-primary' : 'text-foreground/70'
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/dashboard') ? 'text-primary font-semibold' : 'text-foreground/70'
             }`}
           >
             <BarChart3 className="w-4 h-4 inline mr-1" />

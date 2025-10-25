@@ -108,5 +108,16 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function({ addUtilities }: any) {
+      addUtilities({
+        '.bg-clip-text': {
+          'background-clip': 'text',
+          '-webkit-background-clip': 'text',
+          '-webkit-text-fill-color': 'transparent',
+        },
+      });
+    },
+  ],
 } satisfies Config;
