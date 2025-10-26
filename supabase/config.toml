@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.analyze-mood]
 verify_jwt = false
+
+[functions.personalize-exercises]
+verify_jwt = false
