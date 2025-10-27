@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      assessment_results: {
+        Row: {
+          assessment_type: string
+          created_at: string
+          id: string
+          interpretation: string | null
+          responses: Json
+          severity_level: string
+          total_score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assessment_type: string
+          created_at?: string
+          id?: string
+          interpretation?: string | null
+          responses: Json
+          severity_level: string
+          total_score: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assessment_type?: string
+          created_at?: string
+          id?: string
+          interpretation?: string | null
+          responses?: Json
+          severity_level?: string
+          total_score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      assessments: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          questions: Json
+          scoring_rules: Json
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          questions: Json
+          scoring_rules: Json
+          type: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          questions?: Json
+          scoring_rules?: Json
+          type?: string
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           created_at: string
@@ -203,6 +269,51 @@ export type Database = {
           },
         ]
       }
+      mood_calendar: {
+        Row: {
+          activities: string[] | null
+          created_at: string
+          date: string
+          energy_level: number | null
+          id: string
+          mood_label: string
+          mood_score: number
+          notes: string | null
+          sleep_hours: number | null
+          stress_level: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activities?: string[] | null
+          created_at?: string
+          date?: string
+          energy_level?: number | null
+          id?: string
+          mood_label: string
+          mood_score: number
+          notes?: string | null
+          sleep_hours?: number | null
+          stress_level?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activities?: string[] | null
+          created_at?: string
+          date?: string
+          energy_level?: number | null
+          id?: string
+          mood_label?: string
+          mood_score?: number
+          notes?: string | null
+          sleep_hours?: number | null
+          stress_level?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       mood_logs: {
         Row: {
           created_at: string | null
@@ -391,6 +502,36 @@ export type Database = {
           id?: string
           total_points?: number | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wellness_correlations: {
+        Row: {
+          biomarkers: Json | null
+          created_at: string
+          date: string
+          id: string
+          lifestyle: Json | null
+          mood_score: number | null
+          user_id: string
+        }
+        Insert: {
+          biomarkers?: Json | null
+          created_at?: string
+          date?: string
+          id?: string
+          lifestyle?: Json | null
+          mood_score?: number | null
+          user_id: string
+        }
+        Update: {
+          biomarkers?: Json | null
+          created_at?: string
+          date?: string
+          id?: string
+          lifestyle?: Json | null
+          mood_score?: number | null
           user_id?: string
         }
         Relationships: []
