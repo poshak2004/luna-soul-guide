@@ -109,15 +109,26 @@ export default function AssessmentTake() {
     setSubmitting(true);
     const score = calculateScore();
 
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { data, error } = await supabase
       .from("assessment_results")
-      .insert({
+      .insert([{
+        user_id: user.id,
         assessment_type: assessment.type,
         responses: responses as any,
         total_score: score.total,
         severity_level: score.level || JSON.stringify(score.levels),
-        interpretation: score.interpretation,
-      })
+        interpretation: score.interpretation || "",
+      }])
       .select()
       .single();
 
