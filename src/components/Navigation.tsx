@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, BookHeart, BarChart3, LifeBuoy, Sparkles, Trophy, Dumbbell } from "lucide-react";
+import { Heart, MessageCircle, BookHeart, BarChart3, LifeBuoy, Sparkles, Trophy, Dumbbell, ClipboardList, Calendar, Activity } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -53,6 +53,33 @@ const Navigation = () => {
           >
             <Dumbbell className="w-4 h-4 inline mr-1" />
             Exercises
+          </Link>
+          <Link 
+            to="/assessments" 
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/assessments') ? 'text-primary font-semibold' : 'text-foreground/70'
+            }`}
+          >
+            <ClipboardList className="w-4 h-4 inline mr-1" />
+            Assessments
+          </Link>
+          <Link 
+            to="/mood-calendar" 
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/mood-calendar') ? 'text-primary font-semibold' : 'text-foreground/70'
+            }`}
+          >
+            <Calendar className="w-4 h-4 inline mr-1" />
+            Mood
+          </Link>
+          <Link 
+            to="/biomarkers" 
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/biomarkers') ? 'text-primary font-semibold' : 'text-foreground/70'
+            }`}
+          >
+            <Activity className="w-4 h-4 inline mr-1" />
+            Biomarkers
           </Link>
           <Link 
             to="/leaderboard" 

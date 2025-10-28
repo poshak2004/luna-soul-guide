@@ -69,7 +69,18 @@ export default function MoodCalendar() {
   const handleSaveMood = async () => {
     if (!selectedDate) return;
 
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { error } = await supabase.from("mood_calendar").upsert({
+      user_id: user.id,
       date: format(selectedDate, "yyyy-MM-dd"),
       mood_score: moodScore,
       mood_label: moodLabel,

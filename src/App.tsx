@@ -12,6 +12,11 @@ import Dashboard from "./pages/Dashboard";
 import Crisis from "./pages/Crisis";
 import Exercises from "./pages/Exercises";
 import Leaderboard from "./pages/Leaderboard";
+import Assessments from "./pages/Assessments";
+import AssessmentTake from "./pages/AssessmentTake";
+import AssessmentResults from "./pages/AssessmentResults";
+import MoodCalendar from "./pages/MoodCalendar";
+import BiomarkerDashboard from "./pages/BiomarkerDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +37,11 @@ const App = () => (
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/crisis" element={<Crisis />} />
+          <Route path="/assessments" element={<Assessments />} />
+          <Route path="/assessments/:type" element={<AssessmentTake />} />
+          <Route path="/assessments/results/:id" element={<AssessmentResults />} />
+          <Route path="/mood-calendar" element={<MoodCalendar />} />
+          <Route path="/biomarkers" element={<BiomarkerDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
