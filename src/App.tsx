@@ -17,6 +17,10 @@ import AssessmentTake from "./pages/AssessmentTake";
 import AssessmentResults from "./pages/AssessmentResults";
 import MoodCalendar from "./pages/MoodCalendar";
 import BiomarkerDashboard from "./pages/BiomarkerDashboard";
+import CogniArts from "./pages/CogniArts";
+import SensoryHealing from "./pages/SensoryHealing";
+import VoiceCompanion from "./pages/VoiceCompanion";
+import WellnessReports from "./pages/WellnessReports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +46,10 @@ const App = () => (
           <Route path="/assessments/results/:id" element={<AssessmentResults />} />
           <Route path="/mood-calendar" element={<MoodCalendar />} />
           <Route path="/biomarkers" element={<BiomarkerDashboard />} />
+          <Route path="/cogniarts" element={<CogniArts />} />
+          <Route path="/sensory-healing" element={<SensoryHealing />} />
+          <Route path="/luna" element={<VoiceCompanion />} />
+          <Route path="/wellness-reports" element={<WellnessReports />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

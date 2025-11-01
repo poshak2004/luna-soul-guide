@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, BookHeart, BarChart3, LifeBuoy, Sparkles, Trophy, Dumbbell, ClipboardList, Calendar, Activity } from "lucide-react";
+import { Heart, MessageCircle, BookHeart, BarChart3, LifeBuoy, Sparkles, Trophy, Dumbbell, ClipboardList, Calendar, Activity, Palette, Waves, Moon, FileText } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -82,7 +82,43 @@ const Navigation = () => {
             Biomarkers
           </Link>
           <Link 
-            to="/leaderboard" 
+            to="/cogniarts" 
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/cogniarts') ? 'text-primary font-semibold' : 'text-foreground/70'
+            }`}
+          >
+            <Palette className="w-4 h-4 inline mr-1" />
+            Arts
+          </Link>
+          <Link 
+            to="/sensory-healing" 
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/sensory-healing') ? 'text-primary font-semibold' : 'text-foreground/70'
+            }`}
+          >
+            <Waves className="w-4 h-4 inline mr-1" />
+            Sensory
+          </Link>
+          <Link 
+            to="/luna" 
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/luna') ? 'text-primary font-semibold' : 'text-foreground/70'
+            }`}
+          >
+            <Moon className="w-4 h-4 inline mr-1" />
+            Luna
+          </Link>
+          <Link 
+            to="/wellness-reports" 
+            className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
+              isActive('/wellness-reports') ? 'text-primary font-semibold' : 'text-foreground/70'
+            }`}
+          >
+            <FileText className="w-4 h-4 inline mr-1" />
+            Reports
+          </Link>
+          <Link 
+            to="/leaderboard"
             className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-105 ${
               isActive('/leaderboard') ? 'text-primary font-semibold' : 'text-foreground/70'
             }`}
