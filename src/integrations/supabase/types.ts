@@ -447,6 +447,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_artworks: {
+        Row: {
+          brush_strokes: number | null
+          canvas_data: Json | null
+          color_palette: string | null
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          image_url: string
+          mood_tag: string | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brush_strokes?: number | null
+          canvas_data?: Json | null
+          color_palette?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          image_url: string
+          mood_tag?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brush_strokes?: number | null
+          canvas_data?: Json | null
+          color_palette?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          image_url?: string
+          mood_tag?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_badges: {
         Row: {
           badge_id: string

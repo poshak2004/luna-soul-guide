@@ -1,16 +1,22 @@
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import { 
   Palette, Eraser, Undo2, Redo2, Trash2, Circle, Square, 
-  Star, Heart, Sparkles, Volume2, VolumeX 
+  Star, Heart, Sparkles, Volume2, VolumeX, Save, Download, Image as ImageIcon
 } from "lucide-react";
-import { Canvas as FabricCanvas, Circle as FabricCircle, PencilBrush, Path } from "fabric";
+import { Canvas as FabricCanvas, Circle as FabricCircle, Rect, Polygon, PencilBrush, Path } from "fabric";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { AmbientParticles } from "@/components/cogniarts/AmbientParticles";
+import { useAudioReactive } from "@/hooks/useAudioReactive";
 
-type BrushType = "pen" | "paintbrush" | "marker" | "pencil" | "airbrush";
+type BrushType = "pen" | "paintbrush" | "marker" | "watercolor" | "spray";
 type Tool = "draw" | "erase" | "stamp";
+type ColorPalette = "calm" | "healing" | "warm" | "sunrise" | "creative";
 
 const CogniArts = () => {
   const { toast } = useToast();
@@ -21,37 +27,59 @@ const CogniArts = () => {
   const [brushSize, setBrushSize] = useState([5]);
   const [brushOpacity, setBrushOpacity] = useState([100]);
   const [activeColor, setActiveColor] = useState("#4A90E2");
-  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const [history, setHistory] = useState<string[]>([]);
   const [historyStep, setHistoryStep] = useState(-1);
+  const [colorPalette, setColorPalette] = useState<ColorPalette>("calm");
+  const [artworkTitle, setArtworkTitle] = useState("Untitled Artwork");
+  const [isSaving, setIsSaving] = useState(false);
+  const [brushStrokes, setBrushStrokes] = useState(0);
+  const [sessionStart] = useState(Date.now());
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
   
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const oscillatorRef = useRef<OscillatorNode | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
+  const { playStrokeSound } = useAudioReactive(soundEnabled);
 
-  const colors = [
-    { name: "Calm Blue", hex: "#4A90E2" },
-    { name: "Serene Teal", hex: "#50E3C2" },
-    { name: "Joyful Yellow", hex: "#F5D76E" },
-    { name: "Peaceful Green", hex: "#7ED321" },
-    { name: "Passionate Red", hex: "#E24A4A" },
-    { name: "Creative Purple", hex: "#9B51E0" },
-    { name: "Gentle Pink", hex: "#FFB6D9" },
-    { name: "Warm Orange", hex: "#FF9F4A" },
-    { name: "Deep Indigo", hex: "#5856D6" },
-    { name: "Soft Lavender", hex: "#C7B3E5" },
-    { name: "Earthy Brown", hex: "#8B6F47" },
-    { name: "Pure White", hex: "#FFFFFF" },
-  ];
+  const colorPalettes: Record<ColorPalette, Array<{ name: string; hex: string }>> = {
+    calm: [
+      { name: "Ocean Blue", hex: "#4A90E2" },
+      { name: "Serene Teal", hex: "#50E3C2" },
+      { name: "Misty Gray", hex: "#A8D5E2" },
+      { name: "Soft White", hex: "#F0F4F8" },
+    ],
+    healing: [
+      { name: "Forest Green", hex: "#7ED321" },
+      { name: "Mint Fresh", hex: "#50E3C2" },
+      { name: "Sage", hex: "#9FE2BF" },
+      { name: "Moss", hex: "#88B04B" },
+    ],
+    warm: [
+      { name: "Sunset Orange", hex: "#FF9F4A" },
+      { name: "Rose Pink", hex: "#FFB6D9" },
+      { name: "Golden Yellow", hex: "#F5D76E" },
+      { name: "Coral", hex: "#FF6B6B" },
+    ],
+    sunrise: [
+      { name: "Dawn Orange", hex: "#FF9F4A" },
+      { name: "Crimson", hex: "#E24A4A" },
+      { name: "Amber", hex: "#F5D76E" },
+      { name: "Peach", hex: "#FFDAB9" },
+    ],
+    creative: [
+      { name: "Royal Purple", hex: "#9B51E0" },
+      { name: "Lavender", hex: "#C7B3E5" },
+      { name: "Pink Dream", hex: "#FFB6D9" },
+      { name: "Indigo", hex: "#5856D6" },
+    ],
+  };
 
   // Initialize canvas
   useEffect(() => {
     if (!canvasRef.current) return;
 
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: window.innerWidth - 400,
-      height: window.innerHeight - 200,
-      backgroundColor: "#F8F9FA",
+      width: Math.min(window.innerWidth - 400, 1200),
+      height: Math.min(window.innerHeight - 200, 800),
+      backgroundColor: "#FAFBFC",
       isDrawingMode: true,
     });
 
@@ -62,32 +90,27 @@ const CogniArts = () => {
     setFabricCanvas(canvas);
     saveHistory(canvas);
 
+    const handleResize = () => {
+      canvas.setDimensions({
+        width: Math.min(window.innerWidth - 400, 1200),
+        height: Math.min(window.innerHeight - 200, 800),
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+
     return () => {
       canvas.dispose();
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
-  // Initialize audio context
+  // Apply color palette theme
   useEffect(() => {
-    if (soundEnabled && !audioContextRef.current) {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      audioContextRef.current = new AudioContext();
-      
-      const oscillator = audioContextRef.current.createOscillator();
-      const gainNode = audioContextRef.current.createGain();
-      
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(220, audioContextRef.current.currentTime);
-      gainNode.gain.setValueAtTime(0, audioContextRef.current.currentTime);
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContextRef.current.destination);
-      oscillator.start();
-      
-      oscillatorRef.current = oscillator;
-      gainNodeRef.current = gainNode;
-    }
-  }, [soundEnabled]);
+    if (!fabricCanvas) return;
+    const colors = colorPalettes[colorPalette];
+    setActiveColor(colors[0].hex);
+  }, [colorPalette, fabricCanvas]);
 
   // Update brush settings
   useEffect(() => {
@@ -109,19 +132,21 @@ const CogniArts = () => {
     // Adjust brush characteristics
     switch (brushType) {
       case "pen":
-        fabricCanvas.freeDrawingBrush.width = brushSize[0] * 0.5;
+        fabricCanvas.freeDrawingBrush.width = brushSize[0] * 0.6;
         break;
       case "paintbrush":
         fabricCanvas.freeDrawingBrush.width = brushSize[0];
         break;
       case "marker":
-        fabricCanvas.freeDrawingBrush.width = brushSize[0] * 1.5;
+        fabricCanvas.freeDrawingBrush.width = brushSize[0] * 1.8;
         break;
-      case "pencil":
-        fabricCanvas.freeDrawingBrush.width = brushSize[0] * 0.7;
+      case "watercolor":
+        fabricCanvas.freeDrawingBrush.width = brushSize[0] * 1.3;
+        fabricCanvas.freeDrawingBrush.color = hexToRgba(activeColor, brushOpacity[0] * 0.6);
         break;
-      case "airbrush":
-        fabricCanvas.freeDrawingBrush.width = brushSize[0] * 2;
+      case "spray":
+        fabricCanvas.freeDrawingBrush.width = brushSize[0] * 2.5;
+        fabricCanvas.freeDrawingBrush.color = hexToRgba(activeColor, brushOpacity[0] * 0.4);
         break;
     }
   }, [fabricCanvas, activeColor, brushSize, brushOpacity, brushType]);
@@ -152,28 +177,13 @@ const CogniArts = () => {
     const handlePathCreated = (e: any) => {
       saveHistory(fabricCanvas);
       triggerHaptic();
+      setBrushStrokes((prev) => prev + 1);
       
-      if (soundEnabled && gainNodeRef.current && oscillatorRef.current) {
-        const path = e.path as Path;
-        const pathLength = path.path?.length || 1;
-        const speed = Math.min(pathLength / 10, 10);
-        
-        // Adjust sound based on stroke speed
-        const volume = Math.min(speed * 0.05, 0.3);
-        const frequency = 220 + (speed * 20);
-        
-        gainNodeRef.current.gain.setValueAtTime(volume, audioContextRef.current!.currentTime);
-        oscillatorRef.current.frequency.setValueAtTime(frequency, audioContextRef.current!.currentTime);
-        
-        setTimeout(() => {
-          if (gainNodeRef.current) {
-            gainNodeRef.current.gain.exponentialRampToValueAtTime(
-              0.001,
-              audioContextRef.current!.currentTime + 0.5
-            );
-          }
-        }, 100);
-      }
+      const path = e.path as Path;
+      const pathLength = path.path?.length || 1;
+      const speed = Math.min(pathLength / 10, 10);
+      
+      playStrokeSound(speed);
     };
 
     fabricCanvas.on("path:created", handlePathCreated);
@@ -181,7 +191,7 @@ const CogniArts = () => {
     return () => {
       fabricCanvas.off("path:created", handlePathCreated);
     };
-  }, [fabricCanvas, soundEnabled]);
+  }, [fabricCanvas, playStrokeSound]);
 
   const triggerHaptic = () => {
     if ("vibrate" in navigator) {
@@ -235,23 +245,148 @@ const CogniArts = () => {
     setActiveTool("stamp");
     fabricCanvas.isDrawingMode = false;
     
-    // Create a simple circle stamp (for demo - you can enhance with SVG paths)
-    const stamp = new FabricCircle({
-      radius: 30,
-      fill: activeColor,
-      left: fabricCanvas.width! / 2,
-      top: fabricCanvas.height! / 2,
-      opacity: brushOpacity[0] / 100,
-    });
+    let stamp;
+    const centerX = fabricCanvas.width! / 2;
+    const centerY = fabricCanvas.height! / 2;
+    
+    switch (type) {
+      case "circle":
+        stamp = new FabricCircle({
+          radius: 40,
+          fill: activeColor,
+          left: centerX,
+          top: centerY,
+          opacity: brushOpacity[0] / 100,
+        });
+        break;
+      case "star":
+        const points = [];
+        const outerRadius = 40;
+        const innerRadius = 20;
+        for (let i = 0; i < 10; i++) {
+          const radius = i % 2 === 0 ? outerRadius : innerRadius;
+          const angle = (Math.PI / 5) * i - Math.PI / 2;
+          points.push({
+            x: centerX + radius * Math.cos(angle),
+            y: centerY + radius * Math.sin(angle),
+          });
+        }
+        stamp = new Polygon(points, {
+          fill: activeColor,
+          opacity: brushOpacity[0] / 100,
+        });
+        break;
+      case "heart":
+      case "sparkle":
+      default:
+        stamp = new Rect({
+          width: 60,
+          height: 60,
+          fill: activeColor,
+          left: centerX,
+          top: centerY,
+          opacity: brushOpacity[0] / 100,
+          angle: type === "sparkle" ? 45 : 0,
+        });
+    }
     
     fabricCanvas.add(stamp);
     fabricCanvas.setActiveObject(stamp);
     saveHistory(fabricCanvas);
     triggerHaptic();
+    setBrushStrokes((prev) => prev + 1);
     
     toast({
       title: `${type} stamp added`,
       description: "Drag to reposition or resize",
+    });
+  };
+
+  const saveArtwork = async () => {
+    if (!fabricCanvas) return;
+    
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Not authenticated",
+          description: "Please log in to save your artwork",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Generate image data
+      const dataURL = fabricCanvas.toDataURL({ 
+        format: "png", 
+        quality: 0.9,
+        multiplier: 1
+      });
+      const blob = await (await fetch(dataURL)).blob();
+      
+      // Upload to Supabase Storage
+      const fileName = `${user.id}/${Date.now()}-${artworkTitle.replace(/\s+/g, "-")}.png`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("artworks")
+        .upload(fileName, blob, { contentType: "image/png" });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from("artworks")
+        .getPublicUrl(fileName);
+
+      // Save metadata to database
+      const duration = Math.floor((Date.now() - sessionStart) / 1000);
+      const { error: dbError } = await supabase.from("user_artworks").insert({
+        user_id: user.id,
+        title: artworkTitle,
+        image_url: publicUrl,
+        canvas_data: fabricCanvas.toJSON(),
+        duration_seconds: duration,
+        mood_tag: colorPalette,
+        color_palette: colorPalette,
+        brush_strokes: brushStrokes,
+      });
+
+      if (dbError) throw dbError;
+
+      toast({
+        title: "Artwork saved! 🎨",
+        description: `"${artworkTitle}" has been saved to your gallery`,
+      });
+      
+      setShowSaveDialog(false);
+    } catch (error) {
+      console.error("Error saving artwork:", error);
+      toast({
+        title: "Save failed",
+        description: "Could not save your artwork. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const downloadArtwork = () => {
+    if (!fabricCanvas) return;
+    
+    const dataURL = fabricCanvas.toDataURL({ 
+      format: "png", 
+      quality: 1.0,
+      multiplier: 2
+    });
+    const link = document.createElement("a");
+    link.download = `${artworkTitle}.png`;
+    link.href = dataURL;
+    link.click();
+    
+    toast({
+      title: "Downloaded! 💾",
+      description: `${artworkTitle}.png saved to your device`,
     });
   };
 
@@ -266,20 +401,52 @@ const CogniArts = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16 pb-8 px-4 bg-gradient-to-br from-background via-accent/5 to-background">
-      <div className="container mx-auto max-w-[95vw]">
-        <div className="text-center mb-6">
-          <h1 className="text-4xl font-display font-bold mb-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+    <div className="min-h-screen pt-16 pb-8 px-4 relative overflow-hidden">
+      <AmbientParticles colorPalette={colorPalette} />
+      
+      <div className="container mx-auto max-w-[95vw] relative z-10">
+        <motion.div 
+          className="text-center mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h1 className="text-5xl font-display font-bold mb-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent breathe">
             🎨 CogniArts Studio
           </h1>
-          <p className="text-muted-foreground">
-            Multisensory creative therapy space
+          <p className="text-muted-foreground text-lg">
+            Therapeutic digital art with ambient soundscapes
           </p>
-        </div>
+        </motion.div>
 
-        <div className="flex gap-4">
+        <div className="flex gap-6">
           {/* Toolbar */}
-          <Card className="w-80 p-4 glass space-y-4 h-fit">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <Card className="w-80 p-5 glass space-y-5 h-fit shadow-lg hover-lift">
+              {/* Color Palette Theme Selector */}
+              <div>
+                <h3 className="font-semibold mb-3 flex items-center gap-2 text-primary">
+                  <Palette className="w-5 h-5" />
+                  Color Palette
+                </h3>
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  {(["calm", "healing", "warm", "sunrise", "creative"] as ColorPalette[]).map((palette) => (
+                    <Button
+                      key={palette}
+                      variant={colorPalette === palette ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setColorPalette(palette)}
+                      className="capitalize"
+                    >
+                      {palette}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             <div>
               <h3 className="font-semibold mb-3 flex items-center gap-2">
                 <Palette className="w-4 h-4" />
@@ -311,24 +478,31 @@ const CogniArts = () => {
                 </Button>
               </div>
 
-              {activeTool === "draw" && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Brush Style</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {(["pen", "paintbrush", "marker", "pencil", "airbrush"] as BrushType[]).map((type) => (
-                      <Button
-                        key={type}
-                        variant={brushType === type ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setBrushType(type)}
-                        className="capitalize"
-                      >
-                        {type}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <AnimatePresence mode="wait">
+                {activeTool === "draw" && (
+                  <motion.div 
+                    className="space-y-2"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                  >
+                    <label className="text-sm font-medium">Brush Style</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(["pen", "paintbrush", "marker", "watercolor", "spray"] as BrushType[]).map((type) => (
+                        <Button
+                          key={type}
+                          variant={brushType === type ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setBrushType(type)}
+                          className="capitalize"
+                        >
+                          {type}
+                        </Button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             <div>
@@ -353,18 +527,20 @@ const CogniArts = () => {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-3">Color Palette</h3>
+              <h3 className="font-semibold mb-3">Colors</h3>
               <div className="grid grid-cols-4 gap-2">
-                {colors.map((color) => (
-                  <button
+                {colorPalettes[colorPalette].map((color) => (
+                  <motion.button
                     key={color.hex}
                     onClick={() => setActiveColor(color.hex)}
-                    className="w-12 h-12 rounded-lg transition-all hover:scale-110 border-2"
+                    className="w-12 h-12 rounded-xl transition-all hover:scale-110 border-2 shadow-md"
                     style={{
                       backgroundColor: color.hex,
-                      borderColor: activeColor === color.hex ? "#000" : "transparent",
+                      borderColor: activeColor === color.hex ? "hsl(var(--primary))" : "transparent",
                     }}
                     title={color.name}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
                   />
                 ))}
               </div>
@@ -410,6 +586,7 @@ const CogniArts = () => {
                 size="icon"
                 onClick={undo}
                 disabled={historyStep <= 0}
+                title="Undo"
               >
                 <Undo2 className="w-4 h-4" />
               </Button>
@@ -418,6 +595,7 @@ const CogniArts = () => {
                 size="icon"
                 onClick={redo}
                 disabled={historyStep >= history.length - 1}
+                title="Redo"
               >
                 <Redo2 className="w-4 h-4" />
               </Button>
@@ -425,6 +603,7 @@ const CogniArts = () => {
                 variant="outline"
                 size="icon"
                 onClick={toggleSound}
+                title={soundEnabled ? "Disable sound" : "Enable sound"}
               >
                 {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
               </Button>
@@ -432,20 +611,119 @@ const CogniArts = () => {
                 variant="destructive"
                 size="icon"
                 onClick={clearCanvas}
+                title="Clear canvas"
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
             </div>
-          </Card>
+
+            {/* Save & Export */}
+            <div className="space-y-2 pt-4 border-t">
+              <Button
+                className="w-full"
+                onClick={() => setShowSaveDialog(true)}
+                disabled={brushStrokes === 0}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save to Gallery
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={downloadArtwork}
+                disabled={brushStrokes === 0}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download PNG
+              </Button>
+            </div>
+
+            {/* Stats */}
+            <div className="pt-4 border-t text-sm text-muted-foreground space-y-1">
+              <div className="flex justify-between">
+                <span>Brush strokes:</span>
+                <span className="font-semibold">{brushStrokes}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Session time:</span>
+                <span className="font-semibold">
+                  {Math.floor((Date.now() - sessionStart) / 60000)}m
+                </span>
+              </div>
+            </div>
+            </Card>
+          </motion.div>
 
           {/* Canvas */}
-          <Card className="flex-1 p-4 glass">
-            <div className="rounded-lg overflow-hidden shadow-lg">
-              <canvas ref={canvasRef} />
-            </div>
-          </Card>
+          <motion.div 
+            className="flex-1"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <Card className="p-6 glass shadow-2xl glow">
+              <div className="rounded-2xl overflow-hidden shadow-inner bg-white/50">
+                <canvas ref={canvasRef} className="w-full h-full" />
+              </div>
+            </Card>
+          </motion.div>
         </div>
       </div>
+
+      {/* Save Dialog */}
+      <AnimatePresence>
+        {showSaveDialog && (
+          <motion.div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowSaveDialog(false)}
+          >
+            <motion.div
+              className="bg-card p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <ImageIcon className="w-8 h-8 text-primary" />
+                <h2 className="text-2xl font-bold">Save Your Artwork</h2>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Artwork Title</label>
+                  <Input
+                    value={artworkTitle}
+                    onChange={(e) => setArtworkTitle(e.target.value)}
+                    placeholder="Enter a title..."
+                    className="w-full"
+                  />
+                </div>
+                
+                <div className="flex gap-3">
+                  <Button
+                    onClick={saveArtwork}
+                    disabled={isSaving}
+                    className="flex-1"
+                  >
+                    {isSaving ? "Saving..." : "Save to Gallery"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowSaveDialog(false)}
+                    disabled={isSaving}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
