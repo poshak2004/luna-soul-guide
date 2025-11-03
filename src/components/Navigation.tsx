@@ -2,8 +2,8 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Heart, MessageCircle, BookHeart, BarChart3, LifeBuoy, Sparkles, 
-  Trophy, Dumbbell, ClipboardList, Calendar, Activity, Palette, 
-  Waves, Moon, FileText, Home, Menu, X, LogOut, Settings
+  Trophy, Dumbbell, ClipboardList, Calendar, Palette, 
+  Waves, FileText, Home, Menu, X, LogOut
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -50,131 +50,116 @@ const Navigation = () => {
 
   return (
     <>
-      {/* Compact Top Bar */}
+      {/* Clean Top Bar */}
       <motion.nav 
-        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50"
+        className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border/50 shadow-sm"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
-        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group" onClick={() => setIsOpen(false)}>
             <div className="relative">
-              <Heart className="w-7 h-7 text-primary fill-primary group-hover:scale-110 transition-transform duration-300" />
+              <Heart className="w-8 h-8 text-primary fill-primary group-hover:scale-110 transition-transform duration-300" />
               <Sparkles className="w-3 h-3 text-accent absolute -top-0.5 -right-0.5 animate-pulse" />
             </div>
-            <span className="font-display font-bold text-lg text-foreground hidden sm:inline">Luna Soul Guide</span>
+            <span className="font-display font-bold text-xl text-foreground hidden sm:inline">Luna Soul Guide</span>
           </Link>
 
-          {/* Desktop Navigation - Horizontal */}
-          <div className="hidden lg:flex items-center gap-4">
-            {menuItems.slice(0, 6).map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
-                  isActive(item.path)
-                    ? "bg-primary/10 text-primary"
-                    : "text-foreground/70 hover:text-primary hover:bg-primary/5"
-                }`}
-              >
-                <item.icon className="w-4 h-4" />
-                <span className="hidden xl:inline">{item.label}</span>
-              </Link>
-            ))}
-            
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-3">
             {/* Crisis Button - Always Visible */}
             <Link to="/crisis">
               <Button 
                 variant="destructive" 
                 size="sm"
-                className="ml-2 animate-pulse"
+                className="animate-pulse"
               >
-                <LifeBuoy className="w-4 h-4 mr-1.5" />
-                <span className="hidden xl:inline">Crisis</span>
+                <LifeBuoy className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Crisis Help</span>
               </Button>
             </Link>
-          </div>
 
-          {/* Hamburger Button */}
-          <motion.button
-            onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center justify-center w-10 h-10 rounded-md hover:bg-accent/10 transition-colors"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <AnimatePresence mode="wait">
-              {isOpen ? (
-                <motion.div
-                  key="close"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <X className="w-5 h-5 text-foreground" />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="menu"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Menu className="w-5 h-5 text-foreground" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.button>
+            {/* Menu Button */}
+            <motion.button
+              onClick={() => setIsOpen(!isOpen)}
+              className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-accent/10 transition-colors border border-border/50"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <AnimatePresence mode="wait">
+                {isOpen ? (
+                  <motion.div
+                    key="close"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <X className="w-5 h-5 text-foreground" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="menu"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Menu className="w-5 h-5 text-foreground" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.button>
+          </div>
         </div>
       </motion.nav>
 
-      {/* Mobile/Full Menu Drawer */}
+      {/* Dropdown Menu */}
       <AnimatePresence>
         {isOpen && (
           <>
             {/* Backdrop */}
             <motion.div
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Drawer */}
+            {/* Dropdown Panel */}
             <motion.div
-              className="fixed top-14 right-0 bottom-0 w-full sm:w-80 bg-background border-l border-border/50 z-50 overflow-y-auto shadow-2xl"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed top-16 right-4 w-72 bg-background border border-border/50 rounded-2xl shadow-2xl z-50 overflow-hidden"
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
             >
-              <div className="p-6 space-y-6">
+              <div className="max-h-[calc(100vh-5rem)] overflow-y-auto">
                 {/* Menu Items */}
-                <div className="space-y-1">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                <div className="p-4 space-y-1">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">
                     Navigation
                   </p>
                   {menuItems.map((item, index) => (
                     <motion.div
                       key={item.path}
-                      initial={{ opacity: 0, x: 20 }}
+                      initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
+                      transition={{ delay: index * 0.03 }}
                     >
                       <Link
                         to={item.path}
                         onClick={() => setIsOpen(false)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                           isActive(item.path)
                             ? "bg-primary/10 text-primary shadow-sm"
-                            : "text-foreground/70 hover:text-primary hover:bg-accent/50"
+                            : "text-foreground/70 hover:text-foreground hover:bg-accent/50"
                         }`}
                       >
-                        <item.icon className="w-5 h-5" />
+                        <item.icon className="w-4 h-4" />
                         <span>{item.label}</span>
                       </Link>
                     </motion.div>
@@ -182,26 +167,16 @@ const Navigation = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="space-y-1 pt-4 border-t border-border/50">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                    Quick Actions
+                <div className="p-4 pt-2 border-t border-border/50 space-y-1">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">
+                    Account
                   </p>
                   
-                  <Link to="/crisis" onClick={() => setIsOpen(false)}>
-                    <Button 
-                      variant="destructive" 
-                      className="w-full justify-start gap-3 animate-pulse"
-                    >
-                      <LifeBuoy className="w-5 h-5" />
-                      Crisis Help
-                    </Button>
-                  </Link>
-
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-foreground/70 hover:text-primary hover:bg-accent/50 transition-all duration-200 w-full"
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-foreground/70 hover:text-destructive hover:bg-destructive/10 transition-all duration-200 w-full"
                   >
-                    <LogOut className="w-5 h-5" />
+                    <LogOut className="w-4 h-4" />
                     <span>Logout</span>
                   </button>
                 </div>
@@ -212,7 +187,7 @@ const Navigation = () => {
       </AnimatePresence>
 
       {/* Spacer for fixed nav */}
-      <div className="h-14" />
+      <div className="h-16" />
     </>
   );
 };
