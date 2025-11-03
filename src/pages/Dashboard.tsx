@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Calendar, Sparkles, Award, Trophy, Zap, Target } from "lucide-react";
+import { TrendingUp, Calendar, Sparkles, Award, Trophy, Zap, Target, Activity as ActivityIcon } from "lucide-react";
 import { AuthGate } from "@/components/AuthGate";
 import { useJournal } from "@/hooks/useJournal";
 import { useGamification } from "@/hooks/useGamification";
 import { Logo } from "@/components/Logo";
 import { Progress } from "@/components/ui/progress";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
 
 const Dashboard = () => {
   const { entries } = useJournal();
@@ -249,54 +250,76 @@ const Dashboard = () => {
           </div>
 
           {entries.length > 0 && (
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Recent Activity */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                <Card className="glass">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-2xl">
+                      <TrendingUp className="w-6 h-6 text-accent" />
+                      Recent Journal Entries
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {entries.slice(0, 5).map((entry, idx) => (
+                        <motion.div
+                          key={entry.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.1 }}
+                          className="flex items-center gap-4 p-4 bg-muted/20 rounded-xl hover:bg-muted/40 transition-colors cursor-pointer"
+                        >
+                          <div className={`w-12 h-12 rounded-full ${moodColors[entry.mood_label] || 'bg-muted'} flex items-center justify-center flex-shrink-0`}>
+                            <span className="text-2xl">
+                              {entry.mood_label === 'happy' && '😊'}
+                              {entry.mood_label === 'calm' && '😌'}
+                              {entry.mood_label === 'anxious' && '😰'}
+                              {entry.mood_label === 'sad' && '😢'}
+                              {entry.mood_label === 'stressed' && '😓'}
+                              {entry.mood_label === 'neutral' && '😐'}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold capitalize mb-1">
+                              Felt {entry.mood_label}
+                            </p>
+                            <p className="text-xs text-muted-foreground line-clamp-1">
+                              {entry.content}
+                            </p>
+                          </div>
+                          <div className="text-xs text-muted-foreground whitespace-nowrap">
+                            {new Date(entry.created_at).toLocaleDateString()}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Activity Timeline */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+              >
+                <ActivityTimeline />
+              </motion.div>
+            </div>
+          )}
+
+          {entries.length === 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
             >
-              <Card className="glass">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-2xl">
-                    <TrendingUp className="w-6 h-6 text-accent" />
-                    Recent Activity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {entries.slice(0, 5).map((entry, idx) => (
-                      <motion.div
-                        key={entry.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="flex items-center gap-4 p-4 bg-muted/20 rounded-xl hover:bg-muted/40 transition-colors cursor-pointer"
-                      >
-                        <div className={`w-12 h-12 rounded-full ${moodColors[entry.mood_label] || 'bg-muted'} flex items-center justify-center flex-shrink-0`}>
-                          <span className="text-2xl">
-                            {entry.mood_label === 'happy' && '😊'}
-                            {entry.mood_label === 'calm' && '😌'}
-                            {entry.mood_label === 'anxious' && '😰'}
-                            {entry.mood_label === 'sad' && '😢'}
-                            {entry.mood_label === 'stressed' && '😓'}
-                            {entry.mood_label === 'neutral' && '😐'}
-                          </span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold capitalize mb-1">
-                            Felt {entry.mood_label}
-                          </p>
-                          <p className="text-xs text-muted-foreground line-clamp-1">
-                            {entry.content}
-                          </p>
-                        </div>
-                        <div className="text-xs text-muted-foreground whitespace-nowrap">
-                          {new Date(entry.created_at).toLocaleDateString()}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <ActivityTimeline />
             </motion.div>
           )}
         </div>

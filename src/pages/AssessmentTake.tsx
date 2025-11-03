@@ -116,7 +116,27 @@ export default function AssessmentTake() {
         title: "Authentication required",
         variant: "destructive",
       });
+      setSubmitting(false);
       return;
+    }
+
+    // Get AI interpretation
+    let aiInterpretation = "";
+    try {
+      const { data: aiData, error: aiError } = await supabase.functions.invoke('interpret-assessment', {
+        body: {
+          assessmentType: assessment.type,
+          totalScore: score.total,
+          severityLevel: score.level || score.levels,
+          subscales: score.subscales || null,
+        }
+      });
+
+      if (!aiError && aiData?.interpretation) {
+        aiInterpretation = aiData.interpretation;
+      }
+    } catch (error) {
+      console.error('AI interpretation error:', error);
     }
 
     const { data, error } = await supabase
@@ -127,7 +147,7 @@ export default function AssessmentTake() {
         responses: responses as any,
         total_score: score.total,
         severity_level: score.level || JSON.stringify(score.levels),
-        interpretation: score.interpretation || "",
+        interpretation: aiInterpretation || score.interpretation || "Thank you for completing this assessment.",
       }])
       .select()
       .single();
@@ -145,7 +165,7 @@ export default function AssessmentTake() {
 
     toast({
       title: "Assessment completed!",
-      description: "Your results have been saved",
+      description: "Your results have been analyzed",
     });
 
     navigate(`/assessments/results/${data.id}`);

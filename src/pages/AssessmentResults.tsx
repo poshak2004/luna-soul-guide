@@ -121,13 +121,19 @@ export default function AssessmentResults() {
           )}
         </Card>
 
-        {/* Interpretation */}
-        <Card className="glass p-6">
-          <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <Info className="w-5 h-5 text-primary" />
-            What This Means
+        {/* AI Interpretation */}
+        <Card className="glass p-8 bg-gradient-to-br from-support/10 to-accent/10">
+          <h3 className="text-2xl font-semibold mb-4 flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Info className="w-6 h-6 text-primary" />
+            </div>
+            Understanding Your Results
           </h3>
-          <p className="leading-relaxed">{result.interpretation}</p>
+          <div className="prose prose-lg max-w-none">
+            <p className="leading-relaxed text-foreground/90 whitespace-pre-wrap">
+              {result.interpretation}
+            </p>
+          </div>
         </Card>
 
         {/* Recommendations */}
