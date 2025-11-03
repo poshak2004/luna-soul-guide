@@ -2,7 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import Navigation from "./components/Navigation";
 import Landing from "./pages/Landing";
 import Chat from "./pages/Chat";
@@ -25,6 +26,119 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 }
+};
+
+const pageTransition = {
+  type: "tween",
+  ease: "anticipate",
+  duration: 0.4
+};
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <Landing />
+          </motion.div>
+        } />
+        <Route path="/chat" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <Chat />
+          </motion.div>
+        } />
+        <Route path="/onboarding" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <Onboarding />
+          </motion.div>
+        } />
+        <Route path="/journal" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <Journal />
+          </motion.div>
+        } />
+        <Route path="/exercises" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <Exercises />
+          </motion.div>
+        } />
+        <Route path="/leaderboard" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <Leaderboard />
+          </motion.div>
+        } />
+        <Route path="/dashboard" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <Dashboard />
+          </motion.div>
+        } />
+        <Route path="/crisis" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <Crisis />
+          </motion.div>
+        } />
+        <Route path="/assessments" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <Assessments />
+          </motion.div>
+        } />
+        <Route path="/assessments/:type" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <AssessmentTake />
+          </motion.div>
+        } />
+        <Route path="/assessments/results/:id" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <AssessmentResults />
+          </motion.div>
+        } />
+        <Route path="/mood-calendar" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <MoodCalendar />
+          </motion.div>
+        } />
+        <Route path="/biomarkers" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <BiomarkerDashboard />
+          </motion.div>
+        } />
+        <Route path="/cogniarts" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <CogniArts />
+          </motion.div>
+        } />
+        <Route path="/sensory-healing" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <SensoryHealing />
+          </motion.div>
+        } />
+        <Route path="/luna" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <VoiceCompanion />
+          </motion.div>
+        } />
+        <Route path="/wellness-reports" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <WellnessReports />
+          </motion.div>
+        } />
+        <Route path="*" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <NotFound />
+          </motion.div>
+        } />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -32,26 +146,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Navigation />
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/journal" element={<Journal />} />
-          <Route path="/exercises" element={<Exercises />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/crisis" element={<Crisis />} />
-          <Route path="/assessments" element={<Assessments />} />
-          <Route path="/assessments/:type" element={<AssessmentTake />} />
-          <Route path="/assessments/results/:id" element={<AssessmentResults />} />
-          <Route path="/mood-calendar" element={<MoodCalendar />} />
-          <Route path="/biomarkers" element={<BiomarkerDashboard />} />
-          <Route path="/cogniarts" element={<CogniArts />} />
-          <Route path="/sensory-healing" element={<SensoryHealing />} />
-          <Route path="/luna" element={<VoiceCompanion />} />
-          <Route path="/wellness-reports" element={<WellnessReports />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AnimatedRoutes />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
