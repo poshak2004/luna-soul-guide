@@ -4,6 +4,7 @@ import { Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { useAudioVisualizer } from '@/hooks/useAudioVisualizer';
 import { spring } from '@/lib/motion';
+import { useToast } from '@/hooks/use-toast';
 
 interface AudioPlayerProps {
   soundUrl: string;
@@ -27,6 +28,7 @@ export const AudioPlayer = ({
   const [isMuted, setIsMuted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { frequencyData, amplitude, bass, mid } = useAudioVisualizer(audioRef.current);
+  const { toast } = useToast();
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -65,14 +67,30 @@ export const AudioPlayer = ({
 
     try {
       if (isPlaying) {
-        await audio.pause();
+        audio.pause();
         setIsPlaying(false);
       } else {
-        await audio.play();
-        setIsPlaying(true);
+        // Load audio if not loaded
+        if (audio.readyState < 2) {
+          audio.load();
+        }
+        
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+          setIsPlaying(true);
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Playback error:', error);
+      if (error.name === 'NotAllowedError') {
+        toast({
+          title: 'Playback blocked',
+          description: 'Please click play again to start audio',
+          variant: 'destructive',
+        });
+      }
+      setIsPlaying(false);
     }
   };
 
@@ -231,7 +249,14 @@ export const AudioPlayer = ({
               </div>
             </div>
 
-            <audio ref={audioRef} src={soundUrl} loop />
+            <audio 
+              ref={audioRef} 
+              src={soundUrl} 
+              loop 
+              crossOrigin="anonymous"
+              preload="auto"
+              playsInline
+            />
           </motion.div>
         </div>
       </motion.div>

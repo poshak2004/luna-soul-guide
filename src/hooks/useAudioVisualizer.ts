@@ -8,22 +8,29 @@ export const useAudioVisualizer = (audioElement: HTMLAudioElement | null) => {
   const [treble, setTreble] = useState(0);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const rafRef = useRef<number>();
 
   useEffect(() => {
     if (!audioElement) return;
+
+    // Prevent creating multiple sources from the same element
+    if (sourceRef.current) return;
 
     try {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       audioContextRef.current = audioContext;
       
       const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 512; // Higher resolution for better visualization
+      analyser.fftSize = 512;
       analyser.smoothingTimeConstant = 0.75;
       analyser.minDecibels = -90;
       analyser.maxDecibels = -10;
 
+      // Only create source once
       const source = audioContext.createMediaElementSource(audioElement);
+      sourceRef.current = source;
+      
       source.connect(analyser);
       analyser.connect(audioContext.destination);
 
@@ -35,7 +42,7 @@ export const useAudioVisualizer = (audioElement: HTMLAudioElement | null) => {
           analyserRef.current.getByteFrequencyData(dataArray);
           setFrequencyData(new Uint8Array(dataArray));
           
-          // Calculate frequency bands for richer visualization
+          // Calculate frequency bands
           const bassRange = dataArray.slice(0, 32);
           const midRange = dataArray.slice(32, 96);
           const trebleRange = dataArray.slice(96, 128);
@@ -48,7 +55,6 @@ export const useAudioVisualizer = (audioElement: HTMLAudioElement | null) => {
           setMid(midAvg / 255);
           setTreble(trebleAvg / 255);
           
-          // Overall amplitude
           const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
           setAmplitude(avg / 255);
         }
@@ -65,6 +71,7 @@ export const useAudioVisualizer = (audioElement: HTMLAudioElement | null) => {
       };
     } catch (error) {
       console.error('Audio visualization error:', error);
+      // Don't block audio playback if visualization fails
     }
   }, [audioElement]);
 
