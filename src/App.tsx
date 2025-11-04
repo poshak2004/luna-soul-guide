@@ -25,6 +25,7 @@ import VoiceCompanion from "./pages/VoiceCompanion";
 import WellnessReports from "./pages/WellnessReports";
 import Insights from "./pages/Insights";
 import Settings from "./pages/Settings";
+import SoundManager from "./pages/admin/SoundManager";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -149,6 +150,11 @@ const AnimatedRoutes = () => {
         <Route path="/settings" element={
           <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
             <Settings />
+          </motion.div>
+        } loader={protectedLoader} />
+        <Route path="/admin/sounds" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <SoundManager />
           </motion.div>
         } loader={protectedLoader} />
         <Route path="*" element={
