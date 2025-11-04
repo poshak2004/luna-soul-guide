@@ -39,7 +39,8 @@ export default function AssessmentResults() {
     setLoading(false);
   };
 
-  const getSeverityColor = (level: string) => {
+  const getSeverityColor = (level: string | undefined) => {
+    if (!level) return "text-primary";
     const lowerLevel = level.toLowerCase();
     if (lowerLevel.includes("minimal") || lowerLevel.includes("normal")) return "text-green-500";
     if (lowerLevel.includes("mild")) return "text-yellow-500";
@@ -48,7 +49,8 @@ export default function AssessmentResults() {
     return "text-primary";
   };
 
-  const getSeverityIcon = (level: string) => {
+  const getSeverityIcon = (level: string | undefined) => {
+    if (!level) return <TrendingUp className="w-6 h-6 text-primary" />;
     const lowerLevel = level.toLowerCase();
     if (lowerLevel.includes("minimal") || lowerLevel.includes("normal"))
       return <CheckCircle className="w-6 h-6 text-green-500" />;
@@ -106,10 +108,16 @@ export default function AssessmentResults() {
             </div>
           </div>
 
-          {isDASS21 && (
+          {isDASS21 && result.interpretation && result.interpretation.includes(":") && (
             <div className="grid md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-border">
               {result.interpretation.split(",").map((item: string, index: number) => {
-                const [subscale, level] = item.split(":").map((s: string) => s.trim());
+                const parts = item.split(":").map((s: string) => s.trim());
+                const subscale = parts[0];
+                const level = parts[1];
+                
+                // Skip if format is invalid
+                if (!subscale || !level) return null;
+                
                 return (
                   <div key={index} className="text-center">
                     <p className="text-sm text-muted-foreground mb-1">{subscale}</p>
