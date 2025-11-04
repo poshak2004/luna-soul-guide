@@ -146,13 +146,6 @@ export type Database = {
             referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "chat_messages_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       conversations: {
@@ -177,15 +170,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "conversations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       daily_logs: {
         Row: {
@@ -218,15 +203,7 @@ export type Database = {
           points_earned?: number | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "daily_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       journal_entries: {
         Row: {
@@ -259,15 +236,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "journal_entries_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       mood_calendar: {
         Row: {
@@ -342,50 +311,6 @@ export type Database = {
           source_id?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "mood_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string | null
-          current_streak: number | null
-          id: string
-          last_activity_date: string | null
-          longest_streak: number | null
-          total_points: number | null
-          updated_at: string | null
-          username: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string | null
-          current_streak?: number | null
-          id: string
-          last_activity_date?: string | null
-          longest_streak?: number | null
-          total_points?: number | null
-          updated_at?: string | null
-          username?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string | null
-          current_streak?: number | null
-          id?: string
-          last_activity_date?: string | null
-          longest_streak?: number | null
-          total_points?: number | null
-          updated_at?: string | null
-          username?: string | null
-        }
         Relationships: []
       }
       therapy_exercises: {
@@ -413,15 +338,7 @@ export type Database = {
           points_earned?: number | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "therapy_exercises_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_activities: {
         Row: {
@@ -527,6 +444,8 @@ export type Database = {
           created_at: string
           current_streak: number | null
           id: string
+          last_activity_date: string | null
+          longest_streak: number | null
           total_points: number | null
           updated_at: string
           user_id: string
@@ -536,6 +455,8 @@ export type Database = {
           created_at?: string
           current_streak?: number | null
           id?: string
+          last_activity_date?: string | null
+          longest_streak?: number | null
           total_points?: number | null
           updated_at?: string
           user_id: string
@@ -545,6 +466,8 @@ export type Database = {
           created_at?: string
           current_streak?: number | null
           id?: string
+          last_activity_date?: string | null
+          longest_streak?: number | null
           total_points?: number | null
           updated_at?: string
           user_id?: string
