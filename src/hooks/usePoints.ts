@@ -8,9 +8,12 @@ export const usePoints = () => {
   useEffect(() => {
     const fetchPoints = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-      const { data } = await supabase.from('user_profiles').select('total_points').eq('user_id', user.id).single();
+      const { data } = await supabase.from('user_profiles').select('total_points').eq('user_id', user.id).maybeSingle();
       if (data) setTotalPoints(data.total_points);
       setLoading(false);
     };
@@ -21,7 +24,9 @@ export const usePoints = () => {
     const channel = supabase
       .channel('points_updates')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'user_profiles' }, (payload) => {
-        setTotalPoints(payload.new.total_points);
+        if (payload.new.total_points !== undefined) {
+          setTotalPoints(payload.new.total_points);
+        }
       })
       .subscribe();
 

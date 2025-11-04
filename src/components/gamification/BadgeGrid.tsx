@@ -12,10 +12,15 @@ export const BadgeGrid = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('user_badges')
         .select('*, badges(*)')
         .eq('user_id', user.id);
+
+      if (error) {
+        if (import.meta.env.DEV) console.error('Error fetching badges:', error);
+        return;
+      }
 
       setBadges(data || []);
     };

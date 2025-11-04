@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from './use-toast';
+import { rpcWithRetry } from '@/lib/supabaseHelper';
 
 export const useGamification = () => {
   const [profile, setProfile] = useState<any>(null);
@@ -20,7 +21,7 @@ export const useGamification = () => {
       .maybeSingle();
 
     if (error) {
-      console.error('Error fetching profile:', error);
+      if (import.meta.env.DEV) console.error('Error fetching profile:', error);
       return;
     }
 
@@ -34,7 +35,7 @@ export const useGamification = () => {
       .order('points_required', { ascending: true });
 
     if (error) {
-      console.error('Error fetching badges:', error);
+      if (import.meta.env.DEV) console.error('Error fetching badges:', error);
       return;
     }
 
@@ -51,7 +52,7 @@ export const useGamification = () => {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error fetching user badges:', error);
+      if (import.meta.env.DEV) console.error('Error fetching user badges:', error);
       return;
     }
 
@@ -63,8 +64,8 @@ export const useGamification = () => {
     if (!user) return;
 
     try {
-      // Use server-side atomic point addition
-      const { data, error } = await supabase.rpc('add_user_points', {
+      // Use server-side atomic point addition with retry
+      const { data, error } = await rpcWithRetry('add_user_points', {
         _user_id: user.id,
         _activity_type: activityType,
         _points: points,
@@ -83,7 +84,7 @@ export const useGamification = () => {
         description: `You earned ${points} wellness points`,
       });
     } catch (error: any) {
-      console.error('Error adding activity:', error);
+      if (import.meta.env.DEV) console.error('Error adding activity:', error);
       toast({
         title: 'Error',
         description: error.message || 'Failed to add activity',
@@ -97,8 +98,8 @@ export const useGamification = () => {
     if (!user) return;
 
     try {
-      // Use server-side badge validation
-      const { data, error } = await supabase.rpc('check_and_award_badges', {
+      // Use server-side badge validation with retry
+      const { data, error } = await rpcWithRetry('check_and_award_badges', {
         _user_id: user.id,
       });
 
@@ -116,7 +117,7 @@ export const useGamification = () => {
         await fetchUserBadges();
       }
     } catch (error: any) {
-      console.error('Error checking badges:', error);
+      if (import.meta.env.DEV) console.error('Error checking badges:', error);
     }
   };
 

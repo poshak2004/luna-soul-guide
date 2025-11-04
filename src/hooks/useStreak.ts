@@ -8,9 +8,12 @@ export const useStreak = () => {
   useEffect(() => {
     const fetchStreak = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-      const { data } = await supabase.from('user_profiles').select('current_streak').eq('user_id', user.id).single();
+      const { data } = await supabase.from('user_profiles').select('current_streak').eq('user_id', user.id).maybeSingle();
       if (data) setStreak(data.current_streak);
       setLoading(false);
     };
@@ -20,7 +23,9 @@ export const useStreak = () => {
     const channel = supabase
       .channel('streak_updates')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'user_profiles' }, (payload) => {
-        setStreak(payload.new.current_streak);
+        if (payload.new.current_streak !== undefined) {
+          setStreak(payload.new.current_streak);
+        }
       })
       .subscribe();
 

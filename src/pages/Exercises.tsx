@@ -8,6 +8,7 @@ import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { rpcWithRetry } from "@/lib/supabaseHelper";
 
 // Lazy load exercise components for better performance
 const BreatheSync = lazy(() => import("@/components/exercises/BreatheSync").then(m => ({ default: m.BreatheSync })));
@@ -98,22 +99,23 @@ const Exercises = () => {
         mindmirror: 'meditation_exercise',
       };
 
-      const { data, error } = await supabase.rpc('complete_exercise', {
+      // Use atomic RPC function
+      const { data, error } = await rpcWithRetry<any>('complete_exercise_and_award', {
         _user_id: user.id,
         _exercise_type: exerciseTypeMap[exerciseId] || 'breathing_exercise',
       });
 
       if (error) throw error;
 
-      const badgeResult = await supabase.rpc('check_and_award_badges', {
+      // Check for new badges
+      const badgeResult = await rpcWithRetry('check_and_award_badges', {
         _user_id: user.id,
       });
 
-      const result = data as any;
-      if (result?.success) {
+      if (data?.success) {
         toast({
-          title: `🎉 +${result.points_earned} points!`,
-          description: `You earned ${result.points_earned} wellness points`,
+          title: `🎉 +${data.points_earned} points!`,
+          description: `You earned ${data.points_earned} wellness points`,
         });
       }
 
@@ -130,10 +132,16 @@ const Exercises = () => {
       setActiveExercise(null);
       await refreshProfile();
     } catch (error: any) {
-      console.error('Error completing exercise:', error);
+      if (import.meta.env.DEV) console.error('Error completing exercise:', error);
+      
+      // User-friendly error messages
+      const errorMessage = error.message?.includes('wait') 
+        ? 'Please wait a moment before completing this exercise again'
+        : 'Failed to complete exercise. Please try again.';
+      
       toast({
         title: 'Error',
-        description: error.message || 'Failed to complete exercise',
+        description: errorMessage,
         variant: 'destructive',
       });
     }

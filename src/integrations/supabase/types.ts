@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_transactions: {
+        Row: {
+          activity_type: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          points_earned: number
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          points_earned: number
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          points_earned?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       assessment_results: {
         Row: {
           assessment_type: string
@@ -516,6 +543,14 @@ export type Database = {
       check_and_award_badges: { Args: { _user_id: string }; Returns: Json }
       complete_exercise: {
         Args: { _exercise_type: string; _user_id: string }
+        Returns: Json
+      }
+      complete_exercise_and_award: {
+        Args: { _exercise_type: string; _user_id: string }
+        Returns: Json
+      }
+      create_journal_and_award: {
+        Args: { _content: string; _mood: string; _user_id: string }
         Returns: Json
       }
       generate_anonymous_username: { Args: never; Returns: string }

@@ -1,8 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export const rpcWithRetry = async <T>(
-  fnName: any,
-  params: any,
+  fnName: string,
+  params: Record<string, any>,
   maxRetries = 3
 ): Promise<{ data: T | null; error: any }> => {
   for (let i = 0; i < maxRetries; i++) {

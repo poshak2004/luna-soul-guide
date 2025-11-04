@@ -4,14 +4,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { MoodPicker } from './MoodPicker';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useGamification } from '@/hooks/useGamification';
 import { JournalInputSchema } from '@/schemas/zodSchemas';
+import { rpcWithRetry } from '@/lib/supabaseHelper';
 
 export const JournalEditor = ({ onSave }: { onSave: () => void }) => {
   const [content, setContent] = useState('');
   const [mood, setMood] = useState('neutral');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const { addActivity } = useGamification();
 
   const handleSave = async () => {
     try {
@@ -20,15 +20,33 @@ export const JournalEditor = ({ onSave }: { onSave: () => void }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      await supabase.from('journal_entries').insert({ user_id: user.id, content, mood_label: mood });
-      await addActivity('journal_entry', 5);
+      setIsSubmitting(true);
+
+      // Use atomic RPC function
+      const { data, error } = await rpcWithRetry<any>('create_journal_and_award', {
+        _user_id: user.id,
+        _mood: mood,
+        _content: content
+      });
+
+      if (error) throw error;
       
-      toast({ title: 'Journal saved!', description: '+5 wellness points earned' });
+      toast({ 
+        title: 'Journal saved!', 
+        description: `+${data.points_earned} wellness points earned` 
+      });
+      
       setContent('');
       setMood('neutral');
       onSave();
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ 
+        title: 'Error', 
+        description: error.message || 'Failed to save journal', 
+        variant: 'destructive' 
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -42,7 +60,9 @@ export const JournalEditor = ({ onSave }: { onSave: () => void }) => {
         rows={6}
         className="resize-none"
       />
-      <Button onClick={handleSave} disabled={!content.trim()}>Save Entry</Button>
+      <Button onClick={handleSave} disabled={!content.trim() || isSubmitting}>
+        {isSubmitting ? 'Saving...' : 'Save Entry'}
+      </Button>
     </div>
   );
 };
