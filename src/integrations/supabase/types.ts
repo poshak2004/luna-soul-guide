@@ -340,6 +340,51 @@ export type Database = {
         }
         Relationships: []
       }
+      sound_therapy: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          duration_options: number[]
+          file_url: string
+          id: string
+          moods: string[]
+          play_count: number | null
+          purposes: string[]
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          duration_options?: number[]
+          file_url: string
+          id?: string
+          moods?: string[]
+          play_count?: number | null
+          purposes?: string[]
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          duration_options?: number[]
+          file_url?: string
+          id?: string
+          moods?: string[]
+          play_count?: number | null
+          purposes?: string[]
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       therapy_exercises: {
         Row: {
           completed_at: string | null
@@ -501,6 +546,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_sound_history: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          duration_seconds: number
+          id: string
+          points_earned: number | null
+          sound_id: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          duration_seconds: number
+          id?: string
+          points_earned?: number | null
+          sound_id: string
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          duration_seconds?: number
+          id?: string
+          points_earned?: number | null
+          sound_id?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_sound_history_sound_id_fkey"
+            columns: ["sound_id"]
+            isOneToOne: false
+            referencedRelation: "sound_therapy"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wellness_correlations: {
         Row: {
           biomarkers: Json | null
@@ -547,6 +633,15 @@ export type Database = {
       }
       complete_exercise_and_award: {
         Args: { _exercise_type: string; _user_id: string }
+        Returns: Json
+      }
+      complete_sound_session: {
+        Args: {
+          _duration_seconds: number
+          _session_id: string
+          _sound_id: string
+          _user_id: string
+        }
         Returns: Json
       }
       create_journal_and_award: {
