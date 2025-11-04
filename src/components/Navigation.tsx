@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Heart, MessageCircle, BookHeart, BarChart3, LifeBuoy, Sparkles, 
   Trophy, Dumbbell, ClipboardList, Calendar, Palette, 
-  Waves, FileText, Home, Menu, X, LogOut
+  Waves, FileText, Home, Menu, X, LogOut, Settings as SettingsIcon, TrendingUp
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -44,8 +44,10 @@ const Navigation = () => {
     { path: "/cogniarts", label: "CogniArts", icon: Palette },
     { path: "/sensory-healing", label: "Sensory Healing", icon: Waves },
     { path: "/leaderboard", label: "Leaderboard", icon: Trophy },
-    { path: "/dashboard", label: "Insights", icon: BarChart3 },
+    { path: "/insights", label: "Insights", icon: TrendingUp },
+    { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
     { path: "/wellness-reports", label: "Reports", icon: FileText },
+    { path: "/settings", label: "Settings", icon: SettingsIcon },
   ];
 
   return (

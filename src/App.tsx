@@ -22,6 +22,8 @@ import CogniArts from "./pages/CogniArts";
 import SensoryHealing from "./pages/SensoryHealing";
 import VoiceCompanion from "./pages/VoiceCompanion";
 import WellnessReports from "./pages/WellnessReports";
+import Insights from "./pages/Insights";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -127,6 +129,16 @@ const AnimatedRoutes = () => {
         <Route path="/wellness-reports" element={
           <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
             <WellnessReports />
+          </motion.div>
+        } />
+        <Route path="/insights" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <Insights />
+          </motion.div>
+        } />
+        <Route path="/settings" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <Settings />
           </motion.div>
         } />
         <Route path="*" element={
