@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Play, Pause, Heart } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { cardHover, spring } from '@/lib/motion';
 
 interface SoundCardProps {
   id: string;
@@ -38,8 +39,9 @@ export const SoundCard = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.02, y: -4 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      whileHover={cardHover}
+      transition={spring.soft}
+      style={{ willChange: 'transform' }}
     >
       <Card className="glass overflow-hidden group cursor-pointer relative">
         {/* Background gradient glow */}
@@ -47,6 +49,7 @@ export const SoundCard = ({
           className={`absolute inset-0 bg-gradient-to-br ${categoryColors[category]} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
           animate={isPlaying ? { opacity: [0.3, 0.5, 0.3] } : {}}
           transition={{ duration: 3, repeat: Infinity }}
+          style={{ willChange: 'opacity' }}
         />
 
         <CardContent className="relative p-6 space-y-4">
@@ -97,11 +100,13 @@ export const SoundCard = ({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onPlay}
+              transition={spring.snappy}
               className={`
                 relative flex items-center justify-center w-12 h-12 rounded-full
                 ${isPlaying ? 'bg-primary/90' : 'bg-primary'}
                 shadow-lg group-hover:shadow-2xl transition-shadow
               `}
+              style={{ willChange: 'transform' }}
             >
               {isPlaying ? (
                 <Pause className="w-5 h-5 text-white" />
@@ -116,6 +121,7 @@ export const SoundCard = ({
                   initial={{ scale: 1, opacity: 0.5 }}
                   animate={{ scale: 1.8, opacity: 0 }}
                   transition={{ duration: 1.5, repeat: Infinity }}
+                  style={{ willChange: 'transform, opacity' }}
                 />
               )}
             </motion.button>

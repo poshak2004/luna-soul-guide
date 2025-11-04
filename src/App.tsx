@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, redirect } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import Navigation from "./components/Navigation";
 import Landing from "./pages/Landing";
 import Chat from "./pages/Chat";
@@ -53,6 +54,7 @@ const protectedLoader = async () => {
 
 const AnimatedRoutes = () => {
   const location = useLocation();
+  useSmoothScroll(); // Enable ultra-smooth scrolling globally
 
   return (
     <AnimatePresence mode="wait">

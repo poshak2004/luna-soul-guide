@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { useAudioVisualizer } from '@/hooks/useAudioVisualizer';
+import { spring } from '@/lib/motion';
 
 interface AudioPlayerProps {
   soundUrl: string;
@@ -24,7 +25,8 @@ export const AudioPlayer = ({
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
-  const { frequencyData, amplitude } = useAudioVisualizer(audioRef.current);
+  const [isLoading, setIsLoading] = useState(true);
+  const { frequencyData, amplitude, bass, mid } = useAudioVisualizer(audioRef.current);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -43,20 +45,35 @@ export const AudioPlayer = ({
       }
     };
 
+    const handleCanPlay = () => setIsLoading(false);
+    const handleWaiting = () => setIsLoading(true);
+
     audio.addEventListener('timeupdate', handleTimeUpdate);
-    return () => audio.removeEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('waiting', handleWaiting);
+    
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('waiting', handleWaiting);
+    };
   }, [duration, volume, onComplete]);
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play();
+    try {
+      if (isPlaying) {
+        await audio.pause();
+        setIsPlaying(false);
+      } else {
+        await audio.play();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('Playback error:', error);
     }
-    setIsPlaying(!isPlaying);
   };
 
   const toggleMute = () => {
@@ -88,28 +105,57 @@ export const AudioPlayer = ({
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
+        transition={spring.medium}
         className="fixed bottom-0 left-0 right-0 z-50 p-4"
+        style={{ willChange: 'transform' }}
       >
         <div className="container mx-auto max-w-4xl">
           <motion.div
-            className="glass backdrop-blur-xl rounded-2xl shadow-2xl p-6 space-y-4"
+            className="glass backdrop-blur-xl rounded-2xl shadow-2xl p-6 space-y-4 relative overflow-hidden"
             animate={{
-              boxShadow: `0 0 ${20 + amplitude * 40}px rgba(var(--primary-rgb), ${amplitude * 0.5})`
+              boxShadow: `0 0 ${20 + amplitude * 60}px hsl(var(--primary) / ${0.3 + amplitude * 0.4})`,
             }}
+            style={{ willChange: 'box-shadow' }}
           >
-            {/* Waveform Visualizer */}
-            <div className="flex items-center justify-center h-12 gap-1">
-              {Array.from(frequencyData).slice(0, 64).map((value, i) => (
-                <motion.div
-                  key={i}
-                  className="w-1 bg-gradient-to-t from-primary to-accent rounded-full"
-                  animate={{
-                    height: `${(value / 255) * 100}%`,
-                    opacity: 0.3 + (value / 255) * 0.7,
-                  }}
-                  transition={{ duration: 0.1 }}
-                />
-              ))}
+            {/* Animated background glow */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              animate={{
+                background: `radial-gradient(circle at 50% 50%, 
+                  hsl(var(--primary) / ${bass * 0.2}), 
+                  transparent 70%)`,
+              }}
+              style={{ willChange: 'background' }}
+            />
+
+            {/* Enhanced Waveform Visualizer */}
+            <div className="flex items-center justify-center h-16 gap-0.5 relative z-10">
+              {Array.from(frequencyData).slice(0, 80).map((value, i) => {
+                const normalizedValue = value / 255;
+                const barHeight = Math.max(normalizedValue * 100, 2);
+                
+                return (
+                  <motion.div
+                    key={i}
+                    className="w-1 rounded-full"
+                    animate={{
+                      height: `${barHeight}%`,
+                      opacity: 0.4 + normalizedValue * 0.6,
+                      background: `linear-gradient(to top, 
+                        hsl(var(--primary)), 
+                        hsl(var(--accent)))`,
+                    }}
+                    transition={{ 
+                      duration: 0.05,
+                      ease: 'easeOut',
+                    }}
+                    style={{ 
+                      willChange: 'height, opacity',
+                      filter: `blur(${normalizedValue > 0.7 ? '1px' : '0px'})`,
+                    }}
+                  />
+                );
+              })}
             </div>
 
             {/* Title and Close */}
@@ -143,14 +189,27 @@ export const AudioPlayer = ({
 
             {/* Controls */}
             <div className="flex items-center gap-6">
-              {/* Play/Pause */}
+            {/* Play/Pause with breathing glow */}
               <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={togglePlay}
-                className="flex items-center justify-center w-14 h-14 rounded-full bg-primary text-white shadow-lg"
+                className="relative flex items-center justify-center w-14 h-14 rounded-full bg-primary text-white shadow-lg"
+                animate={{
+                  boxShadow: isPlaying 
+                    ? `0 0 ${20 + amplitude * 30}px hsl(var(--primary) / ${0.5 + amplitude * 0.3})`
+                    : '0 4px 12px hsl(var(--primary) / 0.3)',
+                }}
+                transition={spring.soft}
+                style={{ willChange: 'box-shadow, transform' }}
               >
-                {isPlaying ? (
+                {isLoading ? (
+                  <motion.div
+                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  />
+                ) : isPlaying ? (
                   <Pause className="w-6 h-6" />
                 ) : (
                   <Play className="w-6 h-6 ml-1" />

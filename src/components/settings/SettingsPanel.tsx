@@ -6,6 +6,7 @@ import { AccountSettings } from './AccountSettings';
 import { PrivacySettings } from './PrivacySettings';
 import { SoundHaptics } from './SoundHaptics';
 import { NotificationsSettings } from './NotificationsSettings';
+import { PerformanceSettings } from './PerformanceSettings';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,11 +16,12 @@ export const SettingsPanel = () => {
 
   return (
     <Tabs defaultValue="account" className="w-full">
-      <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
+      <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-6' : 'grid-cols-5'}`}>
         <TabsTrigger value="account">Account</TabsTrigger>
         <TabsTrigger value="privacy">Privacy</TabsTrigger>
         <TabsTrigger value="sound">Sound</TabsTrigger>
         <TabsTrigger value="notifications">Notifications</TabsTrigger>
+        <TabsTrigger value="performance">Performance</TabsTrigger>
         {isAdmin && <TabsTrigger value="admin">Admin</TabsTrigger>}
       </TabsList>
       <TabsContent value="account" className="space-y-4">
@@ -33,6 +35,9 @@ export const SettingsPanel = () => {
       </TabsContent>
       <TabsContent value="notifications" className="space-y-4">
         <NotificationsSettings />
+      </TabsContent>
+      <TabsContent value="performance" className="space-y-4">
+        <PerformanceSettings />
       </TabsContent>
       {isAdmin && (
         <TabsContent value="admin" className="space-y-4">

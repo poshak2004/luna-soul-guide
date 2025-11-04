@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { spring, cardHover } from '@/lib/motion';
 
 interface AmbientParticlesProps {
   amplitude?: number;
@@ -24,8 +25,9 @@ export const AmbientParticles = ({ amplitude = 0 }: AmbientParticlesProps) => {
               height: size,
               left: `${left}%`,
               background: `radial-gradient(circle, 
-                hsl(var(--primary) / ${0.05 + amplitude * 0.1}), 
+                hsl(var(--primary) / ${0.08 + amplitude * 0.15}), 
                 transparent)`,
+              willChange: 'transform, opacity',
             }}
             animate={{
               y: ['-20vh', '120vh'],
@@ -33,8 +35,8 @@ export const AmbientParticles = ({ amplitude = 0 }: AmbientParticlesProps) => {
                 `${Math.sin(i) * 10}vw`,
                 `${Math.sin(i + Math.PI) * 10}vw`,
               ],
-              scale: [1, 1.5, 1],
-              opacity: [0, 0.3 + amplitude * 0.3, 0],
+              scale: [1, 1.3 + amplitude * 0.5, 1],
+              opacity: [0, 0.4 + amplitude * 0.4, 0],
             }}
             transition={{
               duration,

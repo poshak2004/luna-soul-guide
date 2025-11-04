@@ -8,10 +8,12 @@ import { AudioPlayer } from '@/components/sensory/AudioPlayer';
 import { FilterBar } from '@/components/sensory/FilterBar';
 import { MoodSync } from '@/components/sensory/MoodSync';
 import { AmbientParticles } from '@/components/sensory/AmbientParticles';
+import { MoodGradient } from '@/components/sensory/MoodGradient';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { rpcWithRetry } from '@/lib/supabaseHelper';
 import { Skeleton } from '@/components/ui/skeleton';
+import { fadeIn } from '@/lib/motion';
 
 interface Sound {
   id: string;
@@ -175,15 +177,20 @@ const SensoryHealing = () => {
 
   return (
     <AuthGate>
-      <div className="min-h-screen pt-16 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-950 dark:to-indigo-950 relative overflow-hidden">
+      <div className="min-h-screen pt-16 relative overflow-hidden">
+        {/* Dynamic mood-reactive gradient background */}
+        <MoodGradient 
+          category={currentSound?.category || 'relaxation'} 
+          amplitude={currentSound ? 0.6 : 0} 
+        />
+        
         {/* Ambient particles */}
         <AmbientParticles amplitude={currentSound ? 0.5 : 0} />
 
         <div className="container mx-auto px-4 py-12 relative z-10">
           {/* Header */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
+            {...fadeIn}
             className="text-center mb-12"
           >
             <div className="flex items-center justify-center gap-4 mb-6">
