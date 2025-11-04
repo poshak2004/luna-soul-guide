@@ -1,9 +1,24 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Input validation
+function validateInput(body: any): { text: string; error?: string } {
+  if (!body.text || typeof body.text !== 'string') {
+    return { text: '', error: 'Text is required' };
+  }
+
+  const trimmed = body.text.trim();
+  if (trimmed.length === 0 || trimmed.length > 2000) {
+    return { text: '', error: 'Text must be 1-2000 characters' };
+  }
+
+  return { text: trimmed };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -11,12 +26,50 @@ serve(async (req) => {
   }
 
   try {
-    const { text } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    // Get and verify user authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate input
+    const body = await req.json();
+    const { text, error: validationError } = validateInput(body);
+    if (validationError) {
+      return new Response(
+        JSON.stringify({ error: validationError }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error('LOVABLE_API_KEY not configured');
+      return new Response(
+        JSON.stringify({ error: 'Service temporarily unavailable' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log(`[Mood] User ${user.id} - analyzing ${text.length} chars`);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -79,14 +132,22 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to analyze mood");
+      const errorText = await response.text();
+      console.error("AI gateway error:", response.status, errorText);
+      return new Response(
+        JSON.stringify({ error: "Unable to analyze mood. Please try again." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const data = await response.json();
     const toolCall = data.choices[0]?.message?.tool_calls?.[0];
     
     if (!toolCall) {
-      throw new Error("No mood analysis returned");
+      return new Response(
+        JSON.stringify({ error: "Mood analysis unavailable. Please try again." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const analysis = JSON.parse(toolCall.function.arguments);
@@ -97,11 +158,8 @@ serve(async (req) => {
   } catch (error) {
     console.error("Mood analysis error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      JSON.stringify({ error: "An error occurred. Please try again." }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

@@ -1,13 +1,1 @@
 project_id = "lqmlradyrdzrqdbinmlb"
-
-[functions.chat]
-verify_jwt = false
-
-[functions.analyze-mood]
-verify_jwt = false
-
-[functions.personalize-exercises]
-verify_jwt = false
-
-[functions.interpret-assessment]
-verify_jwt = false

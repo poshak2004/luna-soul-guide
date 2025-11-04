@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { ChatMessageSchema } from '@/schemas/zodSchemas';
 
 export interface Message {
   id: string;
@@ -12,6 +14,12 @@ export const useChat = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const sendMessage = async (content: string) => {
+    // Validate input
+    try {
+      ChatMessageSchema.parse({ content });
+    } catch (error: any) {
+      throw new Error(error.errors?.[0]?.message || 'Invalid message');
+    }
     const userMessage: Message = {
       id: crypto.randomUUID(),
       role: 'user',
@@ -31,22 +39,27 @@ export const useChat = () => {
     };
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            messages: [...messages, userMessage].map(m => ({
-              role: m.role,
-              content: m.content,
-            })),
-          }),
-        }
-      );
+      // Get auth session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Authentication required');
+      }
+
+      const { data, error } = await supabase.functions.invoke('chat', {
+        body: {
+          messages: [...messages, userMessage].map(m => ({
+            role: m.role,
+            content: m.content,
+          })),
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+      
+      const response = data as Response;
 
       if (!response.ok) {
         throw new Error('Failed to get response');

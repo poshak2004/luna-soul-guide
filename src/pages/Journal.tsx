@@ -17,19 +17,27 @@ const Journal = () => {
   const { toast } = useToast();
 
   const handleSave = async () => {
-    if (!entry.trim()) {
+    try {
+      // Import and validate with Zod
+      const { JournalInputSchema } = await import('@/schemas/zodSchemas');
+      JournalInputSchema.parse({ content: entry, mood });
+
+      const moodScore = { happy: 8, calm: 7, neutral: 5, anxious: 3, sad: 2, stressed: 3 }[mood] || 5;
+      await saveEntry(entry, mood, moodScore);
+      setEntry("");
+      setMood("neutral");
+      
       toast({
-        title: "Empty entry",
-        description: "Write something before saving your thoughts.",
+        title: "Entry saved",
+        description: "Your journal entry has been saved securely.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Validation error",
+        description: error.errors?.[0]?.message || "Invalid entry",
         variant: "destructive"
       });
-      return;
     }
-
-    const moodScore = { happy: 8, calm: 7, neutral: 5, anxious: 3, sad: 2, stressed: 3 }[mood] || 5;
-    await saveEntry(entry, mood, moodScore);
-    setEntry("");
-    setMood("neutral");
   };
 
   const moodOptions = [

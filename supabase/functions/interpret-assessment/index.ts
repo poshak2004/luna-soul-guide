@@ -1,12 +1,38 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation
+function validateInput(body: any): { valid: boolean; error?: string; data?: any } {
+  const validAssessmentTypes = ['DASS-21', 'PHQ-9', 'GAD-7'];
+  
+  if (!body.assessmentType || !validAssessmentTypes.includes(body.assessmentType)) {
+    return { valid: false, error: 'Invalid assessment type' };
+  }
+
+  if (typeof body.totalScore !== 'number' || body.totalScore < 0 || body.totalScore > 100) {
+    return { valid: false, error: 'Invalid total score' };
+  }
+
+  if (!body.severityLevel) {
+    return { valid: false, error: 'Severity level required' };
+  }
+
+  return { 
+    valid: true, 
+    data: {
+      assessmentType: body.assessmentType,
+      totalScore: body.totalScore,
+      severityLevel: body.severityLevel,
+      subscales: body.subscales || null,
+    }
+  };
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -14,9 +40,55 @@ serve(async (req) => {
   }
 
   try {
-    const { assessmentType, totalScore, severityLevel, subscales } = await req.json();
+    // Get and verify user authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    console.log('Interpreting assessment:', { assessmentType, totalScore, severityLevel });
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate input
+    const body = await req.json();
+    const validation = validateInput(body);
+    if (!validation.valid) {
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { assessmentType, totalScore, severityLevel, subscales } = validation.data!;
+
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      console.error('LOVABLE_API_KEY not configured');
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          interpretation: getFallbackInterpretation(assessmentType, severityLevel)
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log(`[Interpret] User ${user.id} - ${assessmentType} score: ${totalScore}`);
 
     let systemPrompt = `You are Luna, a warm and empathetic mental wellness guide specializing in clinical assessment interpretation. 
 Your role is to provide compassionate, clear, and actionable insights based on assessment results. 
@@ -80,7 +152,6 @@ Please provide a supportive interpretation that:
       const errorText = await response.text();
       console.error('AI Gateway error:', response.status, errorText);
       
-      // Return fallback interpretation
       return new Response(
         JSON.stringify({ 
           success: true, 
@@ -108,7 +179,7 @@ Please provide a supportive interpretation that:
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'An error occurred',
         interpretation: 'Thank you for completing this assessment. Your results have been recorded and can help you track your mental wellness journey over time.'
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -116,7 +187,7 @@ Please provide a supportive interpretation that:
   }
 });
 
-function getFallbackInterpretation(assessmentType: string, severityLevel: string): string {
+function getFallbackInterpretation(assessmentType: string, severityLevel: any): string {
   const level = typeof severityLevel === 'string' ? severityLevel.toLowerCase() : '';
   
   if (level.includes('minimal') || level.includes('normal')) {

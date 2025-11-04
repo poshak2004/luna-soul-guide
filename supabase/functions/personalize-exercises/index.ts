@@ -1,12 +1,25 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation
+function validateInput(body: any): { recentMoods: string[]; exerciseHistory: string[]; requestType: string; error?: string } {
+  const validRequestTypes = ['suggestions', 'affirmation', 'journal'];
+  
+  if (!body.requestType || !validRequestTypes.includes(body.requestType)) {
+    return { recentMoods: [], exerciseHistory: [], requestType: '', error: 'Invalid request type' };
+  }
+
+  const recentMoods = Array.isArray(body.recentMoods) ? body.recentMoods.slice(0, 10) : [];
+  const exerciseHistory = Array.isArray(body.exerciseHistory) ? body.exerciseHistory.slice(0, 20) : [];
+
+  return { recentMoods, exerciseHistory, requestType: body.requestType };
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -14,9 +27,50 @@ serve(async (req) => {
   }
 
   try {
-    const { recentMoods, exerciseHistory, requestType } = await req.json();
+    // Get and verify user authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    console.log('Personalization request:', { requestType, recentMoods, exerciseHistory });
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate input
+    const body = await req.json();
+    const { recentMoods, exerciseHistory, requestType, error: validationError } = validateInput(body);
+    if (validationError) {
+      return new Response(
+        JSON.stringify({ error: validationError }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      console.error('LOVABLE_API_KEY not configured');
+      return new Response(
+        JSON.stringify({ error: 'Service temporarily unavailable' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log(`[Personalize] User ${user.id} - ${requestType}`);
 
     const systemPrompt = requestType === 'suggestions' 
       ? `You are a mindful wellness coach. Based on the user's recent mood patterns and exercise history, suggest 2-3 exercises that would be most beneficial right now. Be empathetic, encouraging, and specific.`
@@ -49,7 +103,10 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('AI Gateway error:', response.status, errorText);
-      throw new Error('Failed to get AI response');
+      return new Response(
+        JSON.stringify({ error: 'Unable to generate personalized content. Please try again.' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const data = await response.json();
@@ -71,7 +128,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+        error: 'An error occurred. Please try again.'
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
