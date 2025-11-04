@@ -76,33 +76,46 @@ const CogniArts = () => {
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    const canvas = new FabricCanvas(canvasRef.current, {
-      width: Math.min(window.innerWidth - 400, 1200),
-      height: Math.min(window.innerHeight - 200, 800),
-      backgroundColor: "#FAFBFC",
-      isDrawingMode: true,
-    });
+    const initCanvas = () => {
+      const containerWidth = canvasRef.current?.parentElement?.clientWidth || 800;
+      const canvasWidth = Math.min(containerWidth - 48, 1200);
+      const canvasHeight = Math.min(window.innerHeight * 0.6, 700);
 
-    canvas.freeDrawingBrush = new PencilBrush(canvas);
-    canvas.freeDrawingBrush.color = activeColor;
-    canvas.freeDrawingBrush.width = brushSize[0];
-
-    setFabricCanvas(canvas);
-    saveHistory(canvas);
-
-    const handleResize = () => {
-      canvas.setDimensions({
-        width: Math.min(window.innerWidth - 400, 1200),
-        height: Math.min(window.innerHeight - 200, 800),
+      const canvas = new FabricCanvas(canvasRef.current, {
+        width: canvasWidth,
+        height: canvasHeight,
+        backgroundColor: "#FAFBFC",
+        isDrawingMode: true,
       });
+
+      canvas.freeDrawingBrush = new PencilBrush(canvas);
+      canvas.freeDrawingBrush.color = activeColor;
+      canvas.freeDrawingBrush.width = brushSize[0];
+
+      setFabricCanvas(canvas);
+      saveHistory(canvas);
+
+      const handleResize = () => {
+        const newContainerWidth = canvasRef.current?.parentElement?.clientWidth || 800;
+        const newCanvasWidth = Math.min(newContainerWidth - 48, 1200);
+        const newCanvasHeight = Math.min(window.innerHeight * 0.6, 700);
+        
+        canvas.setDimensions({
+          width: newCanvasWidth,
+          height: newCanvasHeight,
+        });
+        canvas.renderAll();
+      };
+
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        canvas.dispose();
+        window.removeEventListener("resize", handleResize);
+      };
     };
 
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      canvas.dispose();
-      window.removeEventListener("resize", handleResize);
-    };
+    return initCanvas();
   }, []);
 
   // Apply color palette theme
@@ -419,14 +432,15 @@ const CogniArts = () => {
           </p>
         </motion.div>
 
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
           {/* Toolbar */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
+            className="w-full lg:w-80 shrink-0"
           >
-            <Card className="w-80 p-5 glass space-y-5 h-fit shadow-lg hover-lift">
+            <Card className="p-5 glass space-y-5 h-fit shadow-lg hover-lift">
               {/* Color Palette Theme Selector */}
               <div>
                 <h3 className="font-semibold mb-3 flex items-center gap-2 text-primary">
@@ -656,14 +670,14 @@ const CogniArts = () => {
 
           {/* Canvas */}
           <motion.div 
-            className="flex-1"
+            className="flex-1 w-full min-w-0"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
             <Card className="p-6 glass shadow-2xl glow">
-              <div className="rounded-2xl overflow-hidden shadow-inner bg-white/50">
-                <canvas ref={canvasRef} className="w-full h-full" />
+              <div className="rounded-2xl overflow-hidden shadow-inner bg-white/50 flex items-center justify-center">
+                <canvas ref={canvasRef} className="max-w-full" />
               </div>
             </Card>
           </motion.div>
