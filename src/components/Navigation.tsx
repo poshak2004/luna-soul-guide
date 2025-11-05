@@ -15,18 +15,6 @@ const Navigation = () => {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   
-  // Prevent background scroll when menu is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-  
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = async () => {
@@ -146,15 +134,17 @@ const Navigation = () => {
 
             {/* Dropdown Panel */}
             <motion.div
-              className="fixed top-16 right-4 w-72 max-h-[calc(100vh-5rem)] bg-background border border-border/50 rounded-2xl shadow-2xl z-50 flex flex-col"
+              className="fixed top-16 right-4 w-72 bg-background border border-border/50 rounded-2xl shadow-2xl z-50"
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              style={{ overscrollBehavior: 'contain' }}
             >
               {/* Menu Items - Scrollable Area */}
-              <div className="flex-1 overflow-y-auto overflow-x-hidden" style={{ overscrollBehavior: 'contain' }}>
+              <div 
+                className="max-h-[calc(100vh-10rem)] overflow-y-auto overflow-x-hidden scrollbar-thin"
+                onWheel={(e) => e.stopPropagation()}
+              >
                 <div className="p-4 space-y-1">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">
                     Navigation
@@ -181,21 +171,21 @@ const Navigation = () => {
                     </motion.div>
                   ))}
                 </div>
+              </div>
 
-                {/* Actions - Fixed at bottom */}
-                <div className="p-4 pt-2 border-t border-border/50 space-y-1 bg-background">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">
-                    Account
-                  </p>
-                  
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-foreground/70 hover:text-destructive hover:bg-destructive/10 transition-all duration-200 w-full"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
-                  </button>
-                </div>
+              {/* Actions - Fixed at bottom */}
+              <div className="p-4 pt-2 border-t border-border/50 space-y-1 bg-background">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">
+                  Account
+                </p>
+                
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-foreground/70 hover:text-destructive hover:bg-destructive/10 transition-all duration-200 w-full"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
               </div>
             </motion.div>
           </>
