@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Heart, MessageCircle, BookHeart, BarChart3, LifeBuoy, Sparkles, 
   Trophy, Dumbbell, ClipboardList, Calendar, Palette, 
-  Waves, FileText, Home, Menu, X, LogOut, Settings as SettingsIcon, TrendingUp
+  Waves, FileText, Home, Menu, X, LogOut, Settings as SettingsIcon, TrendingUp, BookOpen
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,7 @@ const Navigation = () => {
 
   const menuItems = [
     { path: "/", label: "Home", icon: Home },
+    { path: "/guide", label: "How It Works", icon: BookOpen },
     { path: "/chat", label: "Chat", icon: MessageCircle },
     { path: "/journal", label: "Journal", icon: BookHeart },
     { path: "/exercises", label: "Exercises", icon: Dumbbell },

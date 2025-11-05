@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MessageCircle, BookHeart, BarChart3, Sparkles, Globe, Users, Leaf, Dumbbell, Trophy } from "lucide-react";
+import { MessageCircle, BookHeart, BarChart3, Sparkles, Globe, Users, Leaf, Dumbbell, Trophy, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -68,9 +68,10 @@ const Landing = () => {
                   Talk to Luna
                 </Button>
               </Link>
-              <Link to="/onboarding">
+              <Link to="/guide">
                 <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-2 border-primary/50 hover:bg-primary/10">
-                  Start Your Journey
+                  <BookOpen className="w-5 h-5 mr-2" />
+                  How It Works
                 </Button>
               </Link>
             </motion.div>
