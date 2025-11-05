@@ -97,6 +97,102 @@ const Guide = () => {
           </Card>
         </motion.div>
 
+        {/* How to Use Instructions */}
+        <motion.div
+          className="mb-16"
+          {...fadeIn}
+          transition={{ delay: 0.25 }}
+        >
+          <h2 className="font-display text-3xl font-bold text-center mb-8">
+            How to Get Started
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <Card className="p-6 glass border-primary/20">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0 font-bold text-primary">
+                  1
+                </div>
+                <div>
+                  <h3 className="font-display text-xl font-semibold mb-2">Create Your Account</h3>
+                  <p className="text-muted-foreground">
+                    Sign up with your email to get started. Your data is encrypted and completely private.
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 glass border-primary/20">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0 font-bold text-primary">
+                  2
+                </div>
+                <div>
+                  <h3 className="font-display text-xl font-semibold mb-2">Explore the Dashboard</h3>
+                  <p className="text-muted-foreground">
+                    Your dashboard shows your streaks, points, and quick access to all features. Check it daily!
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 glass border-primary/20">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0 font-bold text-primary">
+                  3
+                </div>
+                <div>
+                  <h3 className="font-display text-xl font-semibold mb-2">Start with Chat or Journal</h3>
+                  <p className="text-muted-foreground">
+                    Talk to Luna about how you're feeling, or write in your private journal. Both earn you points!
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 glass border-primary/20">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0 font-bold text-primary">
+                  4
+                </div>
+                <div>
+                  <h3 className="font-display text-xl font-semibold mb-2">Try Exercises & Sounds</h3>
+                  <p className="text-muted-foreground">
+                    Complete breathing exercises and listen to therapeutic soundscapes when you need to relax.
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 glass border-primary/20">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0 font-bold text-primary">
+                  5
+                </div>
+                <div>
+                  <h3 className="font-display text-xl font-semibold mb-2">Track Your Progress</h3>
+                  <p className="text-muted-foreground">
+                    Visit Insights to see mood trends and wellness analytics. Watch your streaks grow!
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 glass border-primary/20">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0 font-bold text-primary">
+                  6
+                </div>
+                <div>
+                  <h3 className="font-display text-xl font-semibold mb-2">Earn Badges & Climb Ranks</h3>
+                  <p className="text-muted-foreground">
+                    Complete activities to earn points and unlock achievement badges. Check the leaderboard!
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </motion.div>
+
         {/* Features Grid */}
         <motion.div
           {...fadeIn}
