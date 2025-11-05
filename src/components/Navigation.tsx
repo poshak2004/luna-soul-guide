@@ -134,13 +134,13 @@ const Navigation = () => {
 
             {/* Dropdown Panel */}
             <motion.div
-              className="fixed top-16 right-4 w-72 bg-background border border-border/50 rounded-2xl shadow-2xl z-50 overflow-hidden"
+              className="fixed top-16 right-4 w-72 max-h-[calc(100vh-5rem)] bg-background border border-border/50 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col"
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
             >
-              <div className="max-h-[calc(100vh-5rem)] overflow-y-auto">
+              <div className="flex-1 overflow-y-auto overscroll-contain">
                 {/* Menu Items */}
                 <div className="p-4 space-y-1">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">
