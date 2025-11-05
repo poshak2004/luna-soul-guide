@@ -9,6 +9,7 @@ import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import Navigation from "./components/Navigation";
 import Landing from "./pages/Landing";
 import Chat from "./pages/Chat";
+import Guide from "./pages/Guide";
 import Onboarding from "./pages/Onboarding";
 import Journal from "./pages/Journal";
 import Dashboard from "./pages/Dashboard";
@@ -62,6 +63,11 @@ const AnimatedRoutes = () => {
         <Route path="/" element={
           <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
             <Landing />
+          </motion.div>
+        } />
+        <Route path="/guide" element={
+          <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+            <Guide />
           </motion.div>
         } />
         <Route path="/chat" element={

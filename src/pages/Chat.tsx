@@ -9,6 +9,7 @@ import { useVoiceInput } from "@/hooks/useVoiceInput";
 import { AuthGate } from "@/components/AuthGate";
 import { Logo } from "@/components/Logo";
 import { useToast } from "@/hooks/use-toast";
+import { SuggestionButtons } from "@/components/chat/SuggestionButtons";
 
 const Chat = () => {
   const { messages, sendMessage, isLoading } = useChat();
@@ -67,8 +68,18 @@ const Chat = () => {
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.length === 0 && (
-              <div className="text-center text-muted-foreground py-8">
-                <p>Start a conversation with Luna...</p>
+              <div className="text-center py-8 space-y-4">
+                <div className="mb-4">
+                  <Logo size="lg" />
+                  <p className="text-muted-foreground mt-2">Hi there! 🌸 How can I support you today?</p>
+                </div>
+                <SuggestionButtons 
+                  onSelectSuggestion={(text) => {
+                    setInput(text);
+                    setTimeout(() => handleSend(), 100);
+                  }}
+                  disabled={isLoading}
+                />
               </div>
             )}
             {messages.map((message, index) => (
@@ -80,10 +91,10 @@ const Chat = () => {
                 className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl p-4 ${
+                  className={`rounded-2xl p-4 shadow-sm ${
                     message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card border border-border"
+                      ? "bg-gradient-to-br from-primary to-accent text-white max-w-[80%]"
+                      : "bg-gradient-to-br from-card to-muted/30 border border-primary/20 max-w-[85%]"
                   }`}
                 >
                   {message.role === "assistant" && (
@@ -153,31 +164,16 @@ const Chat = () => {
           </div>
         </Card>
 
-        {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mt-6 flex flex-wrap gap-2 justify-center"
-        >
-          {[
-            "I'm feeling anxious",
-            "I need to talk",
-            "Help me reflect",
-            "I'm stressed",
-            "Feeling lonely"
-          ].map((suggestion, index) => (
-            <Button
-              key={index}
-              variant="outline"
-              size="sm"
-              onClick={() => setInput(suggestion)}
-              className="border-primary/30 hover:bg-primary/10"
-            >
-              {suggestion}
-            </Button>
-          ))}
-        </motion.div>
+        {/* Quick Actions - Only show when chat has started */}
+        {messages.length > 0 && (
+          <SuggestionButtons 
+            onSelectSuggestion={(text) => {
+              setInput(text);
+              setTimeout(() => handleSend(), 100);
+            }}
+            disabled={isLoading}
+          />
+        )}
       </div>
     </div>
     </AuthGate>

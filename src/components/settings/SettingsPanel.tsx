@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Music, ExternalLink } from 'lucide-react';
+import { Music, ExternalLink, Sparkles } from 'lucide-react';
 import { AccountSettings } from './AccountSettings';
 import { PrivacySettings } from './PrivacySettings';
 import { SoundHaptics } from './SoundHaptics';
@@ -9,13 +10,18 @@ import { NotificationsSettings } from './NotificationsSettings';
 import { PerformanceSettings } from './PerformanceSettings';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
+import { OnboardingTour } from '@/components/onboarding/OnboardingTour';
 
 export const SettingsPanel = () => {
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
+  const [tourOpen, setTourOpen] = useState(false);
 
   return (
-    <Tabs defaultValue="account" className="w-full">
+    <>
+      <OnboardingTour isOpen={tourOpen} onClose={() => setTourOpen(false)} />
+      
+      <Tabs defaultValue="account" className="w-full">
       <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-6' : 'grid-cols-5'}`}>
         <TabsTrigger value="account">Account</TabsTrigger>
         <TabsTrigger value="privacy">Privacy</TabsTrigger>
@@ -38,6 +44,20 @@ export const SettingsPanel = () => {
       </TabsContent>
       <TabsContent value="performance" className="space-y-4">
         <PerformanceSettings />
+        
+        <Card className="p-6 glass">
+          <h3 className="text-lg font-semibold mb-2">Interactive Tutorial</h3>
+          <p className="text-muted-foreground mb-4">
+            Want to explore Luna's features again? Take the guided tour anytime.
+          </p>
+          <Button 
+            onClick={() => setTourOpen(true)}
+            className="bg-gradient-to-r from-primary to-accent text-white"
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
+            Replay Tutorial
+          </Button>
+        </Card>
       </TabsContent>
       {isAdmin && (
         <TabsContent value="admin" className="space-y-4">
@@ -67,6 +87,7 @@ export const SettingsPanel = () => {
           </Card>
         </TabsContent>
       )}
-    </Tabs>
+      </Tabs>
+    </>
   );
 };
