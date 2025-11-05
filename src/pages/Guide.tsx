@@ -60,7 +60,7 @@ const Guide = () => {
             <Logo size="lg" />
           </div>
           <h1 className="font-display text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            Welcome to Luna Soul Guide
+            Welcome to Emotional Reactive AI
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Your companion for calm, reflection, and emotional clarity. 
@@ -88,7 +88,7 @@ const Guide = () => {
               <h2 className="font-display text-3xl font-bold">What is Luna?</h2>
             </div>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Luna Soul Guide is a gamified wellness platform designed to support your mental health journey. 
+              Emotional Reactive AI is a gamified wellness platform designed to support your mental health journey.
               Through journaling, therapeutic exercises, sensory experiences, and AI-powered insights, 
               Luna helps you understand your emotions, build healthy habits, and find moments of peace 
               in your daily life. Every interaction earns you points, unlocks badges, and contributes 

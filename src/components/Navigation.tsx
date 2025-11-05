@@ -67,7 +67,7 @@ const Navigation = () => {
               <Heart className="w-8 h-8 text-primary fill-primary group-hover:scale-110 transition-transform duration-300" />
               <Sparkles className="w-3 h-3 text-accent absolute -top-0.5 -right-0.5 animate-pulse" />
             </div>
-            <span className="font-display font-bold text-xl text-foreground hidden sm:inline">Luna Soul Guide</span>
+            <span className="font-display font-bold text-xl text-foreground hidden sm:inline">Emotional Reactive AI</span>
           </Link>
 
           {/* Right Side Actions */}
