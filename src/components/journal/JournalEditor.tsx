@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { MoodPicker } from './MoodPicker';
@@ -7,11 +7,23 @@ import { useToast } from '@/hooks/use-toast';
 import { JournalInputSchema } from '@/schemas/zodSchemas';
 import { rpcWithRetry } from '@/lib/supabaseHelper';
 
-export const JournalEditor = ({ onSave }: { onSave: () => void }) => {
+interface JournalEditorProps {
+  onSave: () => void;
+  initialPrompt?: string;
+}
+
+export const JournalEditor = ({ onSave, initialPrompt }: JournalEditorProps) => {
   const [content, setContent] = useState('');
   const [mood, setMood] = useState('neutral');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+
+  // Update content when a prompt is selected
+  useEffect(() => {
+    if (initialPrompt && !content) {
+      setContent(initialPrompt + '\n\n');
+    }
+  }, [initialPrompt]);
 
   const handleSave = async () => {
     try {
@@ -51,16 +63,16 @@ export const JournalEditor = ({ onSave }: { onSave: () => void }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="glass p-6 rounded-lg space-y-4">
       <MoodPicker value={mood} onChange={setMood} />
       <Textarea
-        placeholder="How are you feeling today?"
+        placeholder={content || "How are you feeling today?"}
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        rows={6}
+        rows={10}
         className="resize-none"
       />
-      <Button onClick={handleSave} disabled={!content.trim() || isSubmitting}>
+      <Button onClick={handleSave} disabled={!content.trim() || isSubmitting} className="w-full">
         {isSubmitting ? 'Saving...' : 'Save Entry'}
       </Button>
     </div>

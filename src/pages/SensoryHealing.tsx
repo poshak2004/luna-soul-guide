@@ -9,6 +9,9 @@ import { FilterBar } from '@/components/sensory/FilterBar';
 import { MoodSync } from '@/components/sensory/MoodSync';
 import { AmbientParticles } from '@/components/sensory/AmbientParticles';
 import { MoodGradient } from '@/components/sensory/MoodGradient';
+import { PrePostMoodCheck } from '@/components/therapy/PrePostMoodCheck';
+import { LunaCompanion } from '@/components/luna/LunaCompanion';
+import { useLuna } from '@/hooks/useLuna';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { rpcWithRetry } from '@/lib/supabaseHelper';
@@ -34,8 +37,12 @@ const SensoryHealing = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
   const [currentSound, setCurrentSound] = useState<Sound | null>(null);
-  const [selectedDuration, setSelectedDuration] = useState(300); // 5 minutes default
+  const [selectedDuration, setSelectedDuration] = useState(300);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [showPreCheck, setShowPreCheck] = useState(false);
+  const [showPostCheck, setShowPostCheck] = useState(false);
+  const [preMood, setPreMood] = useState<number | null>(null);
+  const luna = useLuna();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -85,15 +92,16 @@ const SensoryHealing = () => {
 
   const handlePlay = async (sound: Sound) => {
     if (currentSound?.id === sound.id) {
-      // Stop playing
       setCurrentSound(null);
       return;
     }
 
+    // Show pre-session mood check
+    setShowPreCheck(true);
+
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Create session
     const { data: session, error } = await supabase
       .from('user_sound_history')
       .insert({
@@ -117,6 +125,12 @@ const SensoryHealing = () => {
     setCurrentSound(sound);
   };
 
+  const handlePreMoodComplete = (mood: number) => {
+    setPreMood(mood);
+    setShowPreCheck(false);
+    luna.encourage();
+  };
+
   const handleComplete = async () => {
     if (!sessionId || !currentSound) return;
 
@@ -134,12 +148,9 @@ const SensoryHealing = () => {
       if (error) throw error;
 
       if (data?.success) {
-        toast({
-          title: '🎵 Session Complete!',
-          description: `+${data.points_earned} wellness points earned`,
-        });
+        // Show post-session mood check
+        setShowPostCheck(true);
 
-        // Check for badges
         const badgeResult = await rpcWithRetry('check_and_award_badges', {
           _user_id: user.id,
         });
@@ -147,10 +158,7 @@ const SensoryHealing = () => {
         const badgeData = badgeResult.data as any;
         if (badgeData?.awarded_badges && badgeData.awarded_badges.length > 0) {
           badgeData.awarded_badges.forEach((badge: any) => {
-            toast({
-              title: '🏆 New Badge Unlocked!',
-              description: `You earned the "${badge.name}" badge!`,
-            });
+            luna.celebrate(`You earned the "${badge.name}" badge`);
           });
         }
       }
@@ -162,6 +170,43 @@ const SensoryHealing = () => {
         variant: 'destructive',
       });
     }
+  };
+
+  const handlePostMoodComplete = async (postMood: number) => {
+    setShowPostCheck(false);
+    
+    const improvement = postMood - (preMood || 0);
+    
+    if (improvement > 0) {
+      luna.celebrate(`Your mood improved by ${improvement} points`);
+      toast({
+        title: '🌟 Great progress!',
+        description: `Your mood improved by ${improvement} points after this session`,
+      });
+    } else {
+      luna.encourage();
+      toast({
+        title: '💙 Thank you for practicing',
+        description: 'Every session counts, even on tough days',
+      });
+    }
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('mood_logs').insert({
+          user_id: user.id,
+          mood_score: postMood,
+          mood_label: postMood >= 7 ? 'good' : postMood >= 4 ? 'neutral' : 'low',
+          source: 'therapy_session',
+        });
+      }
+    } catch (error) {
+      console.error('Error logging mood:', error);
+    }
+
+    setPreMood(null);
+    setSessionId(null);
   };
 
   const handleMoodToggle = (mood: string) => {
@@ -178,17 +223,14 @@ const SensoryHealing = () => {
   return (
     <AuthGate>
       <div className="min-h-screen pt-16 relative overflow-hidden">
-        {/* Dynamic mood-reactive gradient background */}
         <MoodGradient 
           category={currentSound?.category || 'relaxation'} 
           amplitude={currentSound ? 0.6 : 0} 
         />
         
-        {/* Ambient particles */}
         <AmbientParticles amplitude={currentSound ? 0.5 : 0} />
 
         <div className="container mx-auto px-4 py-12 relative z-10">
-          {/* Header */}
           <motion.div
             {...fadeIn}
             className="text-center mb-12"
@@ -210,12 +252,10 @@ const SensoryHealing = () => {
             </p>
           </motion.div>
 
-          {/* Mood Sync Recommendation */}
           <div className="mb-8">
             <MoodSync onSoundRecommend={handleSoundRecommend} />
           </div>
 
-          {/* Filters */}
           <div className="mb-12">
             <FilterBar
               selectedCategory={selectedCategory}
@@ -225,7 +265,6 @@ const SensoryHealing = () => {
             />
           </div>
 
-          {/* Duration Selection */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -247,7 +286,6 @@ const SensoryHealing = () => {
             ))}
           </motion.div>
 
-          {/* Sound Grid */}
           {loading ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -286,7 +324,6 @@ const SensoryHealing = () => {
           )}
         </div>
 
-        {/* Audio Player */}
         {currentSound && (
           <AudioPlayer
             soundUrl={currentSound.file_url}
@@ -296,6 +333,20 @@ const SensoryHealing = () => {
             onClose={() => setCurrentSound(null)}
           />
         )}
+
+        {showPreCheck && (
+          <PrePostMoodCheck type="pre" onComplete={handlePreMoodComplete} />
+        )}
+        {showPostCheck && (
+          <PrePostMoodCheck type="post" onComplete={handlePostMoodComplete} />
+        )}
+
+        <LunaCompanion
+          emotion={luna.emotion}
+          message={luna.message}
+          showMessage={luna.showMessage}
+          onDismiss={luna.dismiss}
+        />
       </div>
     </AuthGate>
   );
