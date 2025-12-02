@@ -7,10 +7,13 @@ import { useGamification } from "@/hooks/useGamification";
 import { Logo } from "@/components/Logo";
 import { Progress } from "@/components/ui/progress";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { LunaCompanion } from "@/components/luna/LunaCompanion";
+import { useLuna } from "@/hooks/useLuna";
 
 const Dashboard = () => {
   const { entries } = useJournal();
   const { profile, userBadges, badges } = useGamification();
+  const luna = useLuna();
 
   const stats = [
     { 
@@ -323,6 +326,14 @@ const Dashboard = () => {
             </motion.div>
           )}
         </div>
+
+        {/* Luna Companion */}
+        <LunaCompanion
+          emotion={luna.emotion}
+          message={luna.message}
+          showMessage={luna.showMessage}
+          onDismiss={luna.dismiss}
+        />
       </div>
     </AuthGate>
   );

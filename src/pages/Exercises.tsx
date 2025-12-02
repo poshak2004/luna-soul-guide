@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AuthGate } from "@/components/AuthGate";
 import { useGamification } from "@/hooks/useGamification";
 import { Logo } from "@/components/Logo";
+import { LunaCompanion } from "@/components/luna/LunaCompanion";
+import { useLuna } from "@/hooks/useLuna";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,6 +22,7 @@ const FocusSprint = lazy(() => import("@/components/exercises/FocusSprint").then
 const Exercises = () => {
   const [activeExercise, setActiveExercise] = useState<string | null>(null);
   const { refreshProfile } = useGamification();
+  const luna = useLuna();
   const { toast } = useToast();
 
   const exercises = [
@@ -113,6 +116,7 @@ const Exercises = () => {
       });
 
       if (data?.success) {
+        luna.celebrate(`You earned ${data.points_earned} points`);
         toast({
           title: `🎉 +${data.points_earned} points!`,
           description: `You earned ${data.points_earned} wellness points`,
@@ -122,10 +126,7 @@ const Exercises = () => {
       const badgeData = badgeResult.data as any;
       if (badgeData?.awarded_badges && badgeData.awarded_badges.length > 0) {
         badgeData.awarded_badges.forEach((badge: any) => {
-          toast({
-            title: '🏆 New Badge Unlocked!',
-            description: `You earned the "${badge.name}" badge!`,
-          });
+          luna.celebrate(`You earned the "${badge.name}" badge`);
         });
       }
 
@@ -287,6 +288,16 @@ const Exercises = () => {
             </AnimatePresence>
           )}
         </div>
+
+        {/* Luna Companion */}
+        {!activeExercise && (
+          <LunaCompanion
+            emotion={luna.emotion}
+            message={luna.message}
+            showMessage={luna.showMessage}
+            onDismiss={luna.dismiss}
+          />
+        )}
       </div>
     </AuthGate>
   );
