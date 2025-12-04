@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
+import { HomeEntryModes } from "@/components/home/HomeEntryModes";
 
 const Landing = () => {
   return (
@@ -97,6 +98,27 @@ const Landing = () => {
             <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
           </div>
         </motion.div>
+      </section>
+
+      {/* Entry Modes Section */}
+      <section className="py-16 bg-background">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-3">
+              Choose Your Path
+            </h2>
+            <p className="text-muted-foreground">
+              What brings you here today?
+            </p>
+          </motion.div>
+          <HomeEntryModes />
+        </div>
       </section>
 
       {/* Features Section */}
