@@ -7,6 +7,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import Navigation from "./components/Navigation";
+import { CalmNowButton } from "./components/home/CalmNowButton";
+import { AchievementPopup } from "./components/gamification/AchievementPopup";
 import Landing from "./pages/Landing";
 import Chat from "./pages/Chat";
 import Guide from "./pages/Guide";
@@ -183,6 +185,8 @@ const App = () => (
       <BrowserRouter>
         <Navigation />
         <AnimatedRoutes />
+        <CalmNowButton />
+        <AchievementPopup />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

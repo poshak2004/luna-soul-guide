@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Calendar, Sparkles, Award, Trophy, Zap, Target, Activity as ActivityIcon } from "lucide-react";
+import { TrendingUp, Calendar, Sparkles, Award, Trophy, Zap, Target } from "lucide-react";
 import { AuthGate } from "@/components/AuthGate";
 import { useJournal } from "@/hooks/useJournal";
 import { useGamification } from "@/hooks/useGamification";
@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { LunaCompanion } from "@/components/luna/LunaCompanion";
 import { useLuna } from "@/hooks/useLuna";
+import { DailyCheckInWidget } from "@/components/home/DailyCheckInWidget";
 
 const Dashboard = () => {
   const { entries } = useJournal();
@@ -96,6 +97,16 @@ const Dashboard = () => {
               </h1>
             </div>
             <p className="text-muted-foreground text-lg">Track your progress and celebrate your growth journey</p>
+          </motion.div>
+
+          {/* Daily Check-in Widget */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="mb-8"
+          >
+            <DailyCheckInWidget />
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

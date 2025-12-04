@@ -514,6 +514,7 @@ export type Database = {
         Row: {
           anonymous_username: string
           created_at: string
+          current_level: number | null
           current_streak: number | null
           id: string
           last_activity_date: string | null
@@ -521,10 +522,12 @@ export type Database = {
           total_points: number | null
           updated_at: string
           user_id: string
+          xp_total: number | null
         }
         Insert: {
           anonymous_username: string
           created_at?: string
+          current_level?: number | null
           current_streak?: number | null
           id?: string
           last_activity_date?: string | null
@@ -532,10 +535,12 @@ export type Database = {
           total_points?: number | null
           updated_at?: string
           user_id: string
+          xp_total?: number | null
         }
         Update: {
           anonymous_username?: string
           created_at?: string
+          current_level?: number | null
           current_streak?: number | null
           id?: string
           last_activity_date?: string | null
@@ -543,6 +548,7 @@ export type Database = {
           total_points?: number | null
           updated_at?: string
           user_id?: string
+          xp_total?: number | null
         }
         Relationships: []
       }
@@ -563,6 +569,39 @@ export type Database = {
           created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          created_at: string
+          daily_reminder_enabled: boolean | null
+          id: string
+          reminder_time: string | null
+          streak_reminders: boolean | null
+          theme: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          daily_reminder_enabled?: boolean | null
+          id?: string
+          reminder_time?: string | null
+          streak_reminders?: boolean | null
+          theme?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          daily_reminder_enabled?: boolean | null
+          id?: string
+          reminder_time?: string | null
+          streak_reminders?: boolean | null
+          theme?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
