@@ -117,6 +117,7 @@ const Insights = () => {
           showMessage={luna.showMessage}
           onDismiss={luna.dismiss}
           position="fixed"
+          level={luna.level}
         />
       </div>
     </AuthGate>

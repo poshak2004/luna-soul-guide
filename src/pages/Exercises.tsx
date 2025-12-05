@@ -296,6 +296,7 @@ const Exercises = () => {
             message={luna.message}
             showMessage={luna.showMessage}
             onDismiss={luna.dismiss}
+            level={luna.level}
           />
         )}
       </div>
