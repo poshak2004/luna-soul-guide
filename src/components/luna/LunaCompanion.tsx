@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Heart, Zap, Moon, Star } from 'lucide-react';
+import { Sparkles, Heart, Zap, Moon, Star, Crown, Gem, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type LunaEmotion = 'calm' | 'happy' | 'proud' | 'worried' | 'sleepy';
@@ -11,7 +11,22 @@ interface LunaCompanionProps {
   onDismiss?: () => void;
   showMessage?: boolean;
   position?: 'fixed' | 'relative';
+  level?: number;
 }
+
+// Level-based cosmetic upgrades
+const levelCosmetics = {
+  1: { ring: 'ring-0', accessory: null, size: 'w-20 h-20', iconSize: 'w-10 h-10' },
+  2: { ring: 'ring-2 ring-primary/30', accessory: null, size: 'w-20 h-20', iconSize: 'w-10 h-10' },
+  3: { ring: 'ring-2 ring-primary/50', accessory: 'sparkle', size: 'w-20 h-20', iconSize: 'w-10 h-10' },
+  4: { ring: 'ring-2 ring-amber-400/50', accessory: 'sparkle', size: 'w-22 h-22', iconSize: 'w-11 h-11' },
+  5: { ring: 'ring-4 ring-amber-400/60', accessory: 'crown', size: 'w-22 h-22', iconSize: 'w-11 h-11' },
+  6: { ring: 'ring-4 ring-purple-400/60', accessory: 'crown', size: 'w-24 h-24', iconSize: 'w-12 h-12' },
+  7: { ring: 'ring-4 ring-purple-500/70', accessory: 'gem', size: 'w-24 h-24', iconSize: 'w-12 h-12' },
+  8: { ring: 'ring-4 ring-pink-500/70', accessory: 'gem', size: 'w-26 h-26', iconSize: 'w-13 h-13' },
+  9: { ring: 'ring-4 ring-gradient', accessory: 'shield', size: 'w-26 h-26', iconSize: 'w-13 h-13' },
+  10: { ring: 'ring-4 ring-gradient animate-pulse', accessory: 'all', size: 'w-28 h-28', iconSize: 'w-14 h-14' },
+};
 
 const emotionConfig = {
   calm: {
@@ -52,14 +67,68 @@ export const LunaCompanion = ({
   onDismiss,
   showMessage = true,
   position = 'fixed',
+  level = 1,
 }: LunaCompanionProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const config = emotionConfig[emotion];
+  const cosmetic = levelCosmetics[Math.min(level, 10) as keyof typeof levelCosmetics] || levelCosmetics[1];
   const Icon = config.icon;
 
   const handleDismiss = () => {
     setIsVisible(false);
     onDismiss?.();
+  };
+
+  const renderAccessory = () => {
+    if (!cosmetic.accessory) return null;
+    
+    const accessoryClass = "absolute -top-3 left-1/2 -translate-x-1/2 text-amber-400 drop-shadow-lg";
+    
+    if (cosmetic.accessory === 'crown' || cosmetic.accessory === 'all') {
+      return (
+        <motion.div
+          animate={{ y: [0, -2, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className={accessoryClass}
+        >
+          <Crown className="w-6 h-6" />
+        </motion.div>
+      );
+    }
+    if (cosmetic.accessory === 'gem') {
+      return (
+        <motion.div
+          animate={{ rotate: [0, 10, -10, 0] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          className={accessoryClass}
+        >
+          <Gem className="w-5 h-5 text-purple-400" />
+        </motion.div>
+      );
+    }
+    if (cosmetic.accessory === 'shield') {
+      return (
+        <motion.div
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className={accessoryClass}
+        >
+          <Shield className="w-5 h-5 text-emerald-400" />
+        </motion.div>
+      );
+    }
+    if (cosmetic.accessory === 'sparkle') {
+      return (
+        <motion.div
+          animate={{ opacity: [0.5, 1, 0.5], rotate: [0, 180, 360] }}
+          transition={{ duration: 4, repeat: Infinity }}
+          className={accessoryClass}
+        >
+          <Sparkles className="w-4 h-4 text-yellow-300" />
+        </motion.div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -83,6 +152,9 @@ export const LunaCompanion = ({
               className="glass max-w-xs p-4 rounded-2xl relative"
             >
               <p className="text-sm text-foreground">{message}</p>
+              {level > 1 && (
+                <span className="text-xs text-muted-foreground mt-1 block">Luna Lvl {level}</span>
+              )}
               {onDismiss && (
                 <button
                   onClick={handleDismiss}
@@ -108,8 +180,11 @@ export const LunaCompanion = ({
             }}
             className="relative"
           >
+            {/* Level Accessory */}
+            {renderAccessory()}
+
             {/* Particles */}
-            {[...Array(config.particles)].map((_, i) => (
+            {[...Array(config.particles + Math.floor(level / 2))].map((_, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, scale: 0 }}
@@ -139,19 +214,22 @@ export const LunaCompanion = ({
             <motion.div
               whileHover={{ scale: 1.1 }}
               className={cn(
-                'w-20 h-20 rounded-full bg-gradient-to-br flex items-center justify-center shadow-2xl cursor-pointer',
+                'rounded-full bg-gradient-to-br flex items-center justify-center shadow-2xl cursor-pointer',
+                cosmetic.size,
+                cosmetic.ring,
                 config.color,
                 config.glow
               )}
             >
-              <Icon className="w-10 h-10 text-white drop-shadow-lg" />
+              <Icon className={cn('text-white drop-shadow-lg', cosmetic.iconSize)} />
             </motion.div>
 
             {/* Glow Effect */}
             <div
               className={cn(
-                'absolute inset-0 rounded-full blur-xl opacity-50 bg-gradient-to-br',
-                config.color
+                'absolute inset-0 rounded-full blur-xl bg-gradient-to-br',
+                config.color,
+                level >= 5 ? 'opacity-70' : 'opacity-50'
               )}
             />
           </motion.div>
