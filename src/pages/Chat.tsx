@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Send, Mic, MicOff, AlertTriangle } from "lucide-react";
+import { Send, Mic, MicOff, AlertTriangle, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import { SuggestionButtons } from "@/components/chat/SuggestionButtons";
 import { EmotionIndicator } from "@/components/chat/EmotionIndicator";
 import { MicroIntervention } from "@/components/chat/MicroIntervention";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 
 const Chat = () => {
   const { messages, sendMessage, isLoading } = useChat();
@@ -102,16 +103,42 @@ const Chat = () => {
             className="mb-4 p-4 rounded-lg bg-destructive/10 border border-destructive/30"
           >
             <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-destructive mt-0.5" />
+              <AlertTriangle className="w-6 h-6 text-destructive mt-0.5" />
               <div className="flex-1">
-                <p className="font-medium text-destructive">Need immediate support?</p>
+                <p className="font-semibold text-destructive">You're not alone. Help is available.</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  If you're in crisis, please reach out: National Suicide Prevention Lifeline: 988 | Crisis Text Line: Text HOME to 741741
+                  If you're in crisis, please reach out to a professional:
                 </p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    asChild
+                  >
+                    <a href="tel:988" className="flex items-center gap-1">
+                      <Phone className="w-4 h-4" />
+                      Call 988
+                    </a>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    asChild
+                  >
+                    <a href="sms:741741?body=HOME">Text HOME to 741741</a>
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    asChild
+                  >
+                    <Link to="/crisis">View All Resources</Link>
+                  </Button>
+                </div>
                 <Button 
-                  variant="outline" 
+                  variant="ghost" 
                   size="sm" 
-                  className="mt-2"
+                  className="mt-3 text-muted-foreground"
                   onClick={() => setShowCrisisAlert(false)}
                 >
                   I'm okay, dismiss
