@@ -6,12 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useChat } from "@/hooks/useChat";
 import { useVoiceInput } from "@/hooks/useVoiceInput";
+import { useLuna } from "@/hooks/useLuna";
 import { AuthGate } from "@/components/AuthGate";
 import { Logo } from "@/components/Logo";
 import { useToast } from "@/hooks/use-toast";
 import { SuggestionButtons } from "@/components/chat/SuggestionButtons";
 import { EmotionIndicator } from "@/components/chat/EmotionIndicator";
 import { MicroIntervention } from "@/components/chat/MicroIntervention";
+import { LunaCompanion } from "@/components/luna/LunaCompanion";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 
@@ -23,6 +25,18 @@ const Chat = () => {
   const [showCrisisAlert, setShowCrisisAlert] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const luna = useLuna('chat');
+
+  // Make Luna react to detected emotions
+  useEffect(() => {
+    if (detectedEmotion) {
+      if (detectedEmotion.intensity === 'severe') {
+        luna.showCrisisSupport();
+      } else if (detectedEmotion.emotion === 'sad' || detectedEmotion.emotion === 'anxious') {
+        luna.comfort();
+      }
+    }
+  }, [detectedEmotion]);
 
   const { isListening, isSupported, toggleListening } = useVoiceInput({
     onTranscript: (text) => {
@@ -294,6 +308,16 @@ const Chat = () => {
             disabled={isLoading}
           />
         )}
+
+        {/* Luna Companion */}
+        <LunaCompanion
+          emotion={luna.emotion}
+          message={luna.message}
+          showMessage={luna.showMessage}
+          onDismiss={luna.dismiss}
+          level={luna.level}
+          size="sm"
+        />
       </div>
     </div>
     </AuthGate>

@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { Phone, MessageSquare, Heart, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useLuna } from "@/hooks/useLuna";
+import { LunaCompanion } from "@/components/luna/LunaCompanion";
 
 const Crisis = () => {
   const resources = [
@@ -30,6 +32,8 @@ const Crisis = () => {
       action: "Call Now"
     }
   ];
+
+  const luna = useLuna('crisis');
 
   return (
     <div className="min-h-screen pt-16 bg-gradient-calm">
@@ -148,6 +152,15 @@ const Crisis = () => {
             "Even the darkest night will end and the sun will rise." - Victor Hugo
           </p>
         </motion.div>
+
+        {/* Luna Companion - Worried state for crisis support */}
+        <LunaCompanion
+          emotion={luna.emotion}
+          message={luna.message}
+          showMessage={luna.showMessage}
+          onDismiss={luna.dismiss}
+          level={luna.level}
+        />
       </div>
     </div>
   );

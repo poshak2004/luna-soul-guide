@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Phone, PhoneOff, Moon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useLuna } from "@/hooks/useLuna";
+import { LunaCompanion } from "@/components/luna/LunaCompanion";
 
 const VoiceCompanion = () => {
   const { toast } = useToast();
@@ -13,6 +15,7 @@ const VoiceCompanion = () => {
   const [transcript, setTranscript] = useState<string[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const luna = useLuna('chat');
 
   const startSession = async () => {
     try {
@@ -242,6 +245,15 @@ const VoiceCompanion = () => {
             </div>
           </div>
         </Card>
+
+        {/* Luna Companion */}
+        <LunaCompanion
+          emotion={luna.emotion}
+          message={luna.message}
+          showMessage={luna.showMessage}
+          onDismiss={luna.dismiss}
+          level={luna.level}
+        />
       </div>
     </div>
   );
