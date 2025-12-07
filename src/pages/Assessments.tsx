@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ClipboardList, TrendingUp, Brain, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLuna } from "@/hooks/useLuna";
+import { LunaCompanion } from "@/components/luna/LunaCompanion";
 
 export default function Assessments() {
   const [assessments, setAssessments] = useState<any[]>([]);
@@ -13,6 +15,7 @@ export default function Assessments() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const luna = useLuna('assessments');
 
   useEffect(() => {
     fetchAssessments();
@@ -163,6 +166,15 @@ export default function Assessments() {
             </div>
           </div>
         )}
+
+        {/* Luna Companion */}
+        <LunaCompanion
+          emotion={luna.emotion}
+          message={luna.message}
+          showMessage={luna.showMessage}
+          onDismiss={luna.dismiss}
+          level={luna.level}
+        />
       </motion.div>
     </div>
   );

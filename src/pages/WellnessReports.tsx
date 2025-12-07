@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { FileText, Download, Share2, TrendingUp, Calendar, Award } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useLuna } from "@/hooks/useLuna";
+import { LunaCompanion } from "@/components/luna/LunaCompanion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const WellnessReports = () => {
@@ -16,6 +18,7 @@ const WellnessReports = () => {
     totalPoints: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const luna = useLuna('insights');
 
   useEffect(() => {
     fetchReportData();
@@ -180,6 +183,15 @@ const WellnessReports = () => {
             🔒 Your wellness data is private and secure. Reports are only shared when you explicitly choose to do so.
           </p>
         </Card>
+
+        {/* Luna Companion */}
+        <LunaCompanion
+          emotion={luna.emotion}
+          message={luna.message}
+          showMessage={luna.showMessage}
+          onDismiss={luna.dismiss}
+          level={luna.level}
+        />
       </div>
     </div>
   );

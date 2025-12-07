@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLuna } from "@/hooks/useLuna";
+import { LunaCompanion } from "@/components/luna/LunaCompanion";
 import { ArrowLeft, AlertCircle, CheckCircle, Info, TrendingUp } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -14,6 +16,7 @@ export default function AssessmentResults() {
   const { toast } = useToast();
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const luna = useLuna('assessments');
 
   useEffect(() => {
     fetchResult();
@@ -194,6 +197,17 @@ export default function AssessmentResults() {
             </AlertDescription>
           </Alert>
         )}
+
+        {/* Luna Companion */}
+        <LunaCompanion
+          emotion={result.severity_level.toLowerCase().includes("severe") ? 'worried' : luna.emotion}
+          message={result.severity_level.toLowerCase().includes("severe") 
+            ? "I'm here for you. Your wellbeing matters deeply 💜" 
+            : luna.message}
+          showMessage={luna.showMessage}
+          onDismiss={luna.dismiss}
+          level={luna.level}
+        />
       </motion.div>
     </div>
   );

@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLuna } from "@/hooks/useLuna";
+import { LunaCompanion } from "@/components/luna/LunaCompanion";
 import { Calendar as CalendarIcon, Plus, TrendingUp } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, subMonths } from "date-fns";
 
@@ -30,6 +32,7 @@ export default function MoodCalendar() {
   const [showEntry, setShowEntry] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const luna = useLuna('moodCalendar');
 
   // Form state
   const [moodScore, setMoodScore] = useState(5);
@@ -365,6 +368,15 @@ export default function MoodCalendar() {
             </div>
           </div>
         </Card>
+
+        {/* Luna Companion */}
+        <LunaCompanion
+          emotion={luna.emotion}
+          message={luna.message}
+          showMessage={luna.showMessage}
+          onDismiss={luna.dismiss}
+          level={luna.level}
+        />
       </motion.div>
     </div>
   );

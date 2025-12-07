@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,8 @@ import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import Navigation from "./components/Navigation";
 import { CalmNowButton } from "./components/home/CalmNowButton";
 import { AchievementPopup } from "./components/gamification/AchievementPopup";
+import { LunaOnboardingOverlay } from "./components/luna/LunaOnboardingOverlay";
+import { OnboardingTour } from "./components/onboarding/OnboardingTour";
 import Landing from "./pages/Landing";
 import Chat from "./pages/Chat";
 import Guide from "./pages/Guide";
@@ -177,6 +180,42 @@ const AnimatedRoutes = () => {
   );
 };
 
+// Luna Onboarding Manager Component
+const LunaOnboardingManager = () => {
+  const [showLunaIntro, setShowLunaIntro] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user && !user.user_metadata?.luna_introduced) {
+        setShowLunaIntro(true);
+      }
+    };
+    
+    // Check after a brief delay to let auth settle
+    const timer = setTimeout(checkOnboarding, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <>
+      <LunaOnboardingOverlay 
+        isOpen={showLunaIntro} 
+        onClose={() => setShowLunaIntro(false)}
+        onStartTour={() => {
+          setShowLunaIntro(false);
+          setShowTour(true);
+        }}
+      />
+      <OnboardingTour 
+        isOpen={showTour} 
+        onClose={() => setShowTour(false)} 
+      />
+    </>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -187,6 +226,7 @@ const App = () => (
         <AnimatedRoutes />
         <CalmNowButton />
         <AchievementPopup />
+        <LunaOnboardingManager />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
