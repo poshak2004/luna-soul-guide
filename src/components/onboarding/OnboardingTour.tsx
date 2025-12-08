@@ -6,10 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { scaleIn } from '@/lib/motion';
+import { Logo } from '@/components/Logo';
 
 interface TourStep {
   title: string;
   description: string;
+  lunaMessage: string;
+  lunaEmotion: 'calm' | 'happy' | 'proud';
   route: string;
   emoji: string;
 }
@@ -18,42 +21,56 @@ const tourSteps: TourStep[] = [
   {
     title: 'Your Dashboard',
     description: "Here's your home base! See your streaks, points, and quick access to all features.",
+    lunaMessage: "This is where I'll pop up to cheer you on! 🏠",
+    lunaEmotion: 'happy',
     route: '/dashboard',
     emoji: '🏠'
   },
   {
     title: 'Journal Your Thoughts',
     description: "Express yourself freely. Track your moods and earn points for reflection.",
+    lunaMessage: "Writing helps process emotions. I love being here with you! 📝",
+    lunaEmotion: 'calm',
     route: '/journal',
     emoji: '📝'
   },
   {
     title: 'Guided Exercises',
     description: "Try breathing, meditation, or grounding exercises whenever you need calm.",
+    lunaMessage: "Breathing exercises are my favorite! Let's do one together 🧘",
+    lunaEmotion: 'calm',
     route: '/exercises',
     emoji: '🧘‍♀️'
   },
   {
     title: 'Sensory Healing',
     description: "Immerse yourself in therapeutic soundscapes with beautiful audio-reactive visuals.",
+    lunaMessage: "The sounds here are so peaceful... I could float here forever 🎧",
+    lunaEmotion: 'calm',
     route: '/sensory-healing',
     emoji: '🎧'
   },
   {
     title: 'Your Insights',
     description: "Discover patterns in your wellness journey with charts and analytics.",
+    lunaMessage: "I track all your progress here! You're doing amazing 📊",
+    lunaEmotion: 'proud',
     route: '/insights',
     emoji: '📊'
   },
   {
     title: 'Badges & Achievements',
     description: "Unlock badges as you progress! Every milestone matters.",
+    lunaMessage: "Ooh, I get SO excited when you earn badges! 🏆",
+    lunaEmotion: 'happy',
     route: '/leaderboard',
     emoji: '🏆'
   },
   {
     title: 'Settings & Preferences',
-    description: "Customize your Luna experience to fit your needs perfectly.",
+    description: "Customize your experience to fit your needs perfectly.",
+    lunaMessage: "Make everything just right for you! I'll adapt too ⚙️",
+    lunaEmotion: 'calm',
     route: '/settings',
     emoji: '⚙️'
   }
@@ -141,16 +158,56 @@ export const OnboardingTour = ({ isOpen, onClose }: OnboardingTourProps) => {
                 </p>
               </div>
 
+              {/* Luna Avatar with Emotion */}
+              <div className="flex justify-center mb-4">
+                <motion.div
+                  key={step.lunaEmotion}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 200 }}
+                  className="relative"
+                >
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg ${
+                    step.lunaEmotion === 'happy' 
+                      ? 'bg-gradient-to-br from-yellow-400 to-amber-500' 
+                      : step.lunaEmotion === 'proud'
+                      ? 'bg-gradient-to-br from-purple-400 to-pink-500'
+                      : 'bg-gradient-to-br from-primary to-accent'
+                  }`}>
+                    <Logo size="sm" />
+                  </div>
+                  <motion.div
+                    className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-background flex items-center justify-center text-sm shadow"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {step.lunaEmotion === 'happy' ? '😊' : step.lunaEmotion === 'proud' ? '🌟' : '😌'}
+                  </motion.div>
+                </motion.div>
+              </div>
+
               {/* Content */}
-              <div className="text-center mb-6">
-                <div className="text-5xl mb-3">{step.emoji}</div>
-                <h3 className="font-display text-2xl font-bold mb-2">
+              <div className="text-center mb-4">
+                <div className="text-4xl mb-2">{step.emoji}</div>
+                <h3 className="font-display text-xl font-bold mb-2">
                   {step.title}
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {step.description}
                 </p>
               </div>
+
+              {/* Luna's Message Bubble */}
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-primary/10 border border-primary/20 rounded-xl p-3 mb-4"
+              >
+                <p className="text-sm text-center text-primary italic">
+                  "{step.lunaMessage}"
+                </p>
+              </motion.div>
 
               {/* Actions */}
               <div className="flex items-center justify-between gap-3">
@@ -161,7 +218,7 @@ export const OnboardingTour = ({ isOpen, onClose }: OnboardingTourProps) => {
                   className="text-muted-foreground"
                 >
                   <X className="w-4 h-4 mr-1" />
-                  Skip Tour
+                  Skip
                 </Button>
 
                 <div className="flex gap-2">
@@ -182,7 +239,7 @@ export const OnboardingTour = ({ isOpen, onClose }: OnboardingTourProps) => {
                     {currentStep === tourSteps.length - 1 ? (
                       <>
                         <Sparkles className="w-4 h-4 mr-1" />
-                        Finish
+                        Start Journey
                       </>
                     ) : (
                       <>
@@ -193,11 +250,6 @@ export const OnboardingTour = ({ isOpen, onClose }: OnboardingTourProps) => {
                   </Button>
                 </div>
               </div>
-
-              {/* Luna's Message */}
-              <p className="text-xs text-center text-primary/70 mt-4 italic">
-                "You're doing great 🌸, let's explore together!"
-              </p>
             </Card>
           </motion.div>
         </>

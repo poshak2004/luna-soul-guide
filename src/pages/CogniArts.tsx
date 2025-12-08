@@ -13,6 +13,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AmbientParticles } from "@/components/cogniarts/AmbientParticles";
 import { useAudioReactive } from "@/hooks/useAudioReactive";
+import { LunaCompanion } from "@/components/luna/LunaCompanion";
+import { useLuna } from "@/hooks/useLuna";
 
 type BrushType = "pen" | "paintbrush" | "marker" | "watercolor" | "spray";
 type Tool = "draw" | "erase" | "stamp";
@@ -38,6 +40,7 @@ const CogniArts = () => {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   
   const { playStrokeSound } = useAudioReactive(soundEnabled);
+  const luna = useLuna('cogniarts');
 
   const colorPalettes: Record<ColorPalette, Array<{ name: string; hex: string }>> = {
     calm: [
@@ -416,6 +419,7 @@ const CogniArts = () => {
   return (
     <div className="min-h-screen pt-16 pb-8 px-4 relative overflow-hidden">
       <AmbientParticles colorPalette={colorPalette} />
+      <LunaCompanion {...luna} />
       
       <div className="container mx-auto max-w-[95vw] relative z-10">
         <motion.div 
