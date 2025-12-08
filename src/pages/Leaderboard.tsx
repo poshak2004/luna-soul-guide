@@ -7,10 +7,13 @@ import { AuthGate } from "@/components/AuthGate";
 import { supabase } from "@/integrations/supabase/client";
 import { useGamification } from "@/hooks/useGamification";
 import { Logo } from "@/components/Logo";
+import { LunaCompanion } from "@/components/luna/LunaCompanion";
+import { useLuna } from "@/hooks/useLuna";
 
 const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const { profile, userBadges, badges } = useGamification();
+  const luna = useLuna('leaderboard');
 
   useEffect(() => {
     fetchLeaderboard();
@@ -68,6 +71,7 @@ const Leaderboard = () => {
   return (
     <AuthGate>
       <div className="min-h-screen pt-16 bg-gradient-calm">
+        <LunaCompanion {...luna} />
         <div className="container mx-auto px-4 py-12">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
