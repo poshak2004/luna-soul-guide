@@ -578,7 +578,12 @@ export type Database = {
           created_at: string
           daily_reminder_enabled: boolean | null
           id: string
+          luna_size: string | null
+          luna_visible: boolean | null
+          message_frequency: string | null
           reminder_time: string | null
+          show_celebrations: boolean | null
+          show_encouragement: boolean | null
           streak_reminders: boolean | null
           theme: string | null
           updated_at: string
@@ -588,7 +593,12 @@ export type Database = {
           created_at?: string
           daily_reminder_enabled?: boolean | null
           id?: string
+          luna_size?: string | null
+          luna_visible?: boolean | null
+          message_frequency?: string | null
           reminder_time?: string | null
+          show_celebrations?: boolean | null
+          show_encouragement?: boolean | null
           streak_reminders?: boolean | null
           theme?: string | null
           updated_at?: string
@@ -598,7 +608,12 @@ export type Database = {
           created_at?: string
           daily_reminder_enabled?: boolean | null
           id?: string
+          luna_size?: string | null
+          luna_visible?: boolean | null
+          message_frequency?: string | null
           reminder_time?: string | null
+          show_celebrations?: boolean | null
+          show_encouragement?: boolean | null
           streak_reminders?: boolean | null
           theme?: string | null
           updated_at?: string

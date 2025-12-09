@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Music, ExternalLink, Sparkles } from 'lucide-react';
+import { Music, ExternalLink, Sparkles, Moon } from 'lucide-react';
 import { AccountSettings } from './AccountSettings';
 import { PrivacySettings } from './PrivacySettings';
 import { SoundHaptics } from './SoundHaptics';
 import { NotificationsSettings } from './NotificationsSettings';
 import { PerformanceSettings } from './PerformanceSettings';
+import { LunaSettings } from './LunaSettings';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
 import { OnboardingTour } from '@/components/onboarding/OnboardingTour';
@@ -22,9 +23,13 @@ export const SettingsPanel = () => {
       <OnboardingTour isOpen={tourOpen} onClose={() => setTourOpen(false)} />
       
       <Tabs defaultValue="account" className="w-full">
-      <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-6' : 'grid-cols-5'}`}>
+      <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-7' : 'grid-cols-6'}`}>
         <TabsTrigger value="account">Account</TabsTrigger>
         <TabsTrigger value="privacy">Privacy</TabsTrigger>
+        <TabsTrigger value="luna" className="flex items-center gap-1">
+          <Moon className="w-3 h-3" />
+          Luna
+        </TabsTrigger>
         <TabsTrigger value="sound">Sound</TabsTrigger>
         <TabsTrigger value="notifications">Notifications</TabsTrigger>
         <TabsTrigger value="performance">Performance</TabsTrigger>
@@ -35,6 +40,9 @@ export const SettingsPanel = () => {
       </TabsContent>
       <TabsContent value="privacy" className="space-y-4">
         <PrivacySettings />
+      </TabsContent>
+      <TabsContent value="luna" className="space-y-4">
+        <LunaSettings />
       </TabsContent>
       <TabsContent value="sound" className="space-y-4">
         <SoundHaptics />
