@@ -221,7 +221,7 @@ const SensoryHealing = () => {
   };
 
   return (
-    <AuthGate>
+    <>
       <div className="min-h-screen pt-16 relative overflow-hidden">
         <MoodGradient 
           category={currentSound?.category || 'relaxation'} 
