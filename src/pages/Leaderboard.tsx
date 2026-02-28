@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Trophy, Medal, Award, Sparkles, Crown, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AuthGate } from "@/components/AuthGate";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useGamification } from "@/hooks/useGamification";
 import { Logo } from "@/components/Logo";
@@ -69,7 +69,7 @@ const Leaderboard = () => {
   };
 
   return (
-    <AuthGate>
+    <>
       <div className="min-h-screen pt-16 bg-gradient-calm">
         <LunaCompanion {...luna} />
         <div className="container mx-auto px-4 py-12">
@@ -227,7 +227,7 @@ const Leaderboard = () => {
           </div>
         </div>
       </div>
-    </AuthGate>
+    </>
   );
 };
 

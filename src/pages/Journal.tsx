@@ -1,4 +1,4 @@
-import { AuthGate } from '@/components/AuthGate';
+
 import { Logo } from '@/components/Logo';
 import { JournalEditor } from '@/components/journal/JournalEditor';
 import { JournalList } from '@/components/journal/JournalList';
@@ -22,7 +22,7 @@ const Journal = () => {
   };
 
   return (
-    <AuthGate>
+    <>
       <div className="min-h-screen bg-gradient-calm p-6">
         <header className="max-w-6xl mx-auto mb-8">
           <Logo />
@@ -56,7 +56,7 @@ const Journal = () => {
           level={luna.level}
         />
       </div>
-    </AuthGate>
+    </>
   );
 };
 

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Calendar, Sparkles, Award, Trophy, Zap, Target } from "lucide-react";
-import { AuthGate } from "@/components/AuthGate";
+
 import { useJournal } from "@/hooks/useJournal";
 import { useGamification } from "@/hooks/useGamification";
 import { Logo } from "@/components/Logo";
@@ -77,7 +77,7 @@ const Dashboard = () => {
     : 100;
 
   return (
-    <AuthGate>
+    <>
       <div className="min-h-screen pt-16 bg-gradient-calm">
         <div className="container mx-auto px-4 py-12 max-w-7xl">
           <motion.div 
@@ -347,7 +347,7 @@ const Dashboard = () => {
           level={luna.level}
         />
       </div>
-    </AuthGate>
+    </>
   );
 };
 

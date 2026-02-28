@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { useChat } from "@/hooks/useChat";
 import { useVoiceInput } from "@/hooks/useVoiceInput";
 import { useLuna } from "@/hooks/useLuna";
-import { AuthGate } from "@/components/AuthGate";
+
 import { Logo } from "@/components/Logo";
 import { useToast } from "@/hooks/use-toast";
 import { SuggestionButtons } from "@/components/chat/SuggestionButtons";
@@ -106,7 +106,7 @@ const Chat = () => {
   };
 
   return (
-    <AuthGate>
+    <>
     <div className="min-h-screen pt-16 bg-gradient-calm">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Crisis Alert */}
@@ -320,7 +320,7 @@ const Chat = () => {
         />
       </div>
     </div>
-    </AuthGate>
+    </>
   );
 };
 

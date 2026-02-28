@@ -8,7 +8,7 @@ import { SoundList } from '@/components/admin/SoundList';
 import { useAdmin } from '@/hooks/useAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { AuthGate } from '@/components/AuthGate';
+
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function SoundManager() {
@@ -50,25 +50,23 @@ export default function SoundManager() {
 
   if (!isAdmin) {
     return (
-      <AuthGate>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-            <p className="text-muted-foreground mb-6">
-              You don't have permission to access this page.
-            </p>
-            <Button onClick={() => navigate('/')}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Go Home
-            </Button>
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+          <p className="text-muted-foreground mb-6">
+            You don't have permission to access this page.
+          </p>
+          <Button onClick={() => navigate('/')}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Go Home
+          </Button>
         </div>
-      </AuthGate>
+      </div>
     );
   }
 
   return (
-    <AuthGate>
+    <>
       <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
         <div className="container mx-auto px-4 py-8 max-w-6xl">
           <motion.div
@@ -136,6 +134,6 @@ export default function SoundManager() {
           </Tabs>
         </div>
       </div>
-    </AuthGate>
+    </>
   );
 }

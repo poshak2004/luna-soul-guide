@@ -1,4 +1,4 @@
-import { AuthGate } from '@/components/AuthGate';
+
 import { Logo } from '@/components/Logo';
 import { StreakCard } from '@/components/insights/StreakCard';
 import { PointsBar } from '@/components/insights/PointsBar';
@@ -17,7 +17,7 @@ const Insights = () => {
   const luna = useLuna();
 
   return (
-    <AuthGate>
+    <>
       <div className="min-h-screen bg-gradient-calm p-6 pt-20">
         <header className="max-w-6xl mx-auto mb-8">
           <Logo />
@@ -120,7 +120,7 @@ const Insights = () => {
           level={luna.level}
         />
       </div>
-    </AuthGate>
+    </>
   );
 };
 

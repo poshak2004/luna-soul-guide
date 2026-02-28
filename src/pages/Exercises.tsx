@@ -2,7 +2,7 @@ import { useState, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Wind, Brain, Target, Heart, Zap, Sparkles, BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AuthGate } from "@/components/AuthGate";
+
 import { useGamification } from "@/hooks/useGamification";
 import { Logo } from "@/components/Logo";
 import { LunaCompanion } from "@/components/luna/LunaCompanion";
@@ -151,7 +151,7 @@ const Exercises = () => {
   const activeExerciseData = exercises.find(e => e.id === activeExercise);
 
   return (
-    <AuthGate>
+    <>
       <div className="min-h-screen pt-16 bg-gradient-calm">
         <div className="container mx-auto px-4 py-12">
           {!activeExercise ? (
@@ -300,7 +300,7 @@ const Exercises = () => {
           />
         )}
       </div>
-    </AuthGate>
+    </>
   );
 };
 
