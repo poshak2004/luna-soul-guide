@@ -151,7 +151,7 @@ const Exercises = () => {
   const activeExerciseData = exercises.find(e => e.id === activeExercise);
 
   return (
-    <AuthGate>
+    <>
       <div className="min-h-screen pt-16 bg-gradient-calm">
         <div className="container mx-auto px-4 py-12">
           {!activeExercise ? (
