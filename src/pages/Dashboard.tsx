@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Calendar, Sparkles, Award, Trophy, Zap, Target } from "lucide-react";
-import { AuthGate } from "@/components/AuthGate";
+
 import { useJournal } from "@/hooks/useJournal";
 import { useGamification } from "@/hooks/useGamification";
 import { Logo } from "@/components/Logo";

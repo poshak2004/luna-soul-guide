@@ -8,7 +8,7 @@ import { SoundList } from '@/components/admin/SoundList';
 import { useAdmin } from '@/hooks/useAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { AuthGate } from '@/components/AuthGate';
+
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function SoundManager() {

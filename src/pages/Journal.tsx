@@ -1,4 +1,4 @@
-import { AuthGate } from '@/components/AuthGate';
+
 import { Logo } from '@/components/Logo';
 import { JournalEditor } from '@/components/journal/JournalEditor';
 import { JournalList } from '@/components/journal/JournalList';

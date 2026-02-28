@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { useChat } from "@/hooks/useChat";
 import { useVoiceInput } from "@/hooks/useVoiceInput";
 import { useLuna } from "@/hooks/useLuna";
-import { AuthGate } from "@/components/AuthGate";
+
 import { Logo } from "@/components/Logo";
 import { useToast } from "@/hooks/use-toast";
 import { SuggestionButtons } from "@/components/chat/SuggestionButtons";

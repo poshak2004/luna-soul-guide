@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Music } from 'lucide-react';
-import { AuthGate } from '@/components/AuthGate';
+
 import { Logo } from '@/components/Logo';
 import { SoundCard } from '@/components/sensory/SoundCard';
 import { AudioPlayer } from '@/components/sensory/AudioPlayer';

@@ -1,4 +1,4 @@
-import { AuthGate } from '@/components/AuthGate';
+
 import { Logo } from '@/components/Logo';
 import { StreakCard } from '@/components/insights/StreakCard';
 import { PointsBar } from '@/components/insights/PointsBar';

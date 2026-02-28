@@ -2,7 +2,7 @@ import { useState, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Wind, Brain, Target, Heart, Zap, Sparkles, BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AuthGate } from "@/components/AuthGate";
+
 import { useGamification } from "@/hooks/useGamification";
 import { Logo } from "@/components/Logo";
 import { LunaCompanion } from "@/components/luna/LunaCompanion";
