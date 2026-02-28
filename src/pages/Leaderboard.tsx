@@ -69,7 +69,7 @@ const Leaderboard = () => {
   };
 
   return (
-    <AuthGate>
+    <>
       <div className="min-h-screen pt-16 bg-gradient-calm">
         <LunaCompanion {...luna} />
         <div className="container mx-auto px-4 py-12">
