@@ -22,7 +22,7 @@ const Journal = () => {
   };
 
   return (
-    <AuthGate>
+    <>
       <div className="min-h-screen bg-gradient-calm p-6">
         <header className="max-w-6xl mx-auto mb-8">
           <Logo />
