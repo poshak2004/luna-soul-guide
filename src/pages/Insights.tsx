@@ -120,7 +120,7 @@ const Insights = () => {
           level={luna.level}
         />
       </div>
-    </AuthGate>
+    </>
   );
 };
 

@@ -349,7 +349,7 @@ const SensoryHealing = () => {
           level={luna.level}
         />
       </div>
-    </AuthGate>
+    </>
   );
 };
 

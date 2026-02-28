@@ -347,7 +347,7 @@ const Dashboard = () => {
           level={luna.level}
         />
       </div>
-    </AuthGate>
+    </>
   );
 };
 

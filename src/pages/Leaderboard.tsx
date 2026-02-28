@@ -227,7 +227,7 @@ const Leaderboard = () => {
           </div>
         </div>
       </div>
-    </AuthGate>
+    </>
   );
 };
 

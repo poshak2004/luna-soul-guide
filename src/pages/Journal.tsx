@@ -56,7 +56,7 @@ const Journal = () => {
           level={luna.level}
         />
       </div>
-    </AuthGate>
+    </>
   );
 };
 

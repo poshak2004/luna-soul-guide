@@ -320,7 +320,7 @@ const Chat = () => {
         />
       </div>
     </div>
-    </AuthGate>
+    </>
   );
 };
 

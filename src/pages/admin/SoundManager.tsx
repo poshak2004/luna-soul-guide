@@ -134,6 +134,6 @@ export default function SoundManager() {
           </Tabs>
         </div>
       </div>
-    </AuthGate>
+    </>
   );
 }
