@@ -23,16 +23,19 @@ export const SoundUpload = ({ onUploadComplete }: SoundUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/x-wav', 'audio/wave'];
+  const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
-    if (!selectedFile.type.includes('audio')) {
-      toast.error('Please select a valid audio file');
+    if (!ALLOWED_AUDIO_TYPES.includes(selectedFile.type)) {
+      toast.error('Invalid file type. Allowed: MP3, WAV, OGG');
       return;
     }
 
-    if (selectedFile.size > 20 * 1024 * 1024) {
+    if (selectedFile.size > MAX_FILE_SIZE) {
       toast.error('File size must be less than 20MB');
       return;
     }
@@ -54,7 +57,7 @@ export const SoundUpload = ({ onUploadComplete }: SoundUploadProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split('.').pop()?.replace(/[^a-zA-Z0-9]/g, '') || 'mp3';
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `therapy/${fileName}`;
 
