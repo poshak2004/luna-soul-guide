@@ -25,9 +25,27 @@ const FocusSprint = lazy(() => import("@/components/exercises/FocusSprint").then
 
 const Exercises = () => {
   const [activeExercise, setActiveExercise] = useState<string | null>(null);
+  const [showIntent, setShowIntent] = useState(false);
+  const [pendingExercise, setPendingExercise] = useState<string | null>(null);
+  const [sessionIntent, setSessionIntent] = useState('');
+  const [showReflection, setShowReflection] = useState(false);
+  const [completedExerciseId, setCompletedExerciseId] = useState<string | null>(null);
   const { refreshProfile } = useGamification();
   const luna = useLuna();
   const { toast } = useToast();
+  const { streak, weeklyCount, recordSession } = useLocalStreak();
+
+  const handleExerciseClick = (exerciseId: string) => {
+    setPendingExercise(exerciseId);
+    setShowIntent(true);
+  };
+
+  const startExercise = (intent: string) => {
+    setSessionIntent(intent);
+    setShowIntent(false);
+    setActiveExercise(pendingExercise);
+    setPendingExercise(null);
+  };
 
   const exercises = [
     {
