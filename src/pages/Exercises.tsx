@@ -11,6 +11,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { rpcWithRetry } from "@/lib/supabaseHelper";
+import { useLocalStreak } from "@/hooks/useLocalStreak";
+import { StreakBanner } from "@/components/reinforcement/StreakBanner";
+import { SessionIntent } from "@/components/reinforcement/SessionIntent";
+import { SessionReflection } from "@/components/reinforcement/SessionReflection";
 
 // Lazy load exercise components for better performance
 const BreatheSync = lazy(() => import("@/components/exercises/BreatheSync").then(m => ({ default: m.BreatheSync })));
