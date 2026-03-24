@@ -219,6 +219,33 @@ const Exercises = () => {
                 </p>
               </motion.div>
 
+              {/* Streak Banner */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="max-w-7xl mx-auto mb-6"
+              >
+                <StreakBanner streak={streak} weeklyCount={weeklyCount} />
+              </motion.div>
+
+              {/* Session Intent */}
+              <AnimatePresence>
+                {showIntent && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="max-w-xl mx-auto mb-6"
+                  >
+                    <SessionIntent
+                      onSubmit={startExercise}
+                      onSkip={() => startExercise('General wellness')}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {/* Exercise Grid */}
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
                 {exercises.map((exercise, index) => (
