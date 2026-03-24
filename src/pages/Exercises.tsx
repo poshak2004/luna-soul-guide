@@ -261,7 +261,7 @@ const Exercises = () => {
                   >
                     <Card 
                       className="glass hover-lift cursor-pointer group h-full overflow-hidden relative border-2"
-                      onClick={() => setActiveExercise(exercise.id)}
+                      onClick={() => handleExerciseClick(exercise.id)}
                     >
                       {/* Background glow effect */}
                       <motion.div
