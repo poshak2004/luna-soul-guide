@@ -111,11 +111,43 @@ const Exercises = () => {
   ];
 
   const completeExercise = async (exerciseId: string) => {
+    // Show reflection first before finishing
+    setCompletedExerciseId(exerciseId);
+    setShowReflection(true);
+  };
+
+  const handleReflection = async (quality: 'focused' | 'distracted') => {
+    setShowReflection(false);
+    const exerciseId = completedExerciseId;
+    setCompletedExerciseId(null);
+
+    // Record streak
+    const streakResult = recordSession();
+    if (streakResult.increased) {
+      toast({
+        title: `🔥 Day ${streakResult.currentStreak} streak — don't break it!`,
+        description: sessionIntent ? `Focus: ${sessionIntent} • ${quality}` : `Session: ${quality}`,
+      });
+    } else if (streakResult.reset) {
+      toast({
+        title: '✨ New start — let\'s build consistency',
+        description: `Session: ${quality}. Every day counts.`,
+      });
+    } else {
+      toast({
+        title: `✅ Session complete`,
+        description: `Session: ${quality}. Streak: ${streakResult.currentStreak} days.`,
+      });
+    }
+
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setActiveExercise(null);
+      setSessionIntent('');
+      return;
+    }
 
     try {
-      // Map exercise IDs to database exercise types
       const exerciseTypeMap: Record<string, string> = {
         breathesync: 'breathing_exercise',
         reflectloop: 'meditation_exercise',
@@ -124,25 +156,19 @@ const Exercises = () => {
         mindmirror: 'meditation_exercise',
       };
 
-      // Use atomic RPC function
       const { data, error } = await rpcWithRetry<any>('complete_exercise_and_award', {
         _user_id: user.id,
-        _exercise_type: exerciseTypeMap[exerciseId] || 'breathing_exercise',
+        _exercise_type: exerciseTypeMap[exerciseId!] || 'breathing_exercise',
       });
 
       if (error) throw error;
 
-      // Check for new badges
       const badgeResult = await rpcWithRetry('check_and_award_badges', {
         _user_id: user.id,
       });
 
       if (data?.success) {
         luna.celebrate(`You earned ${data.points_earned} points`);
-        toast({
-          title: `🎉 +${data.points_earned} points!`,
-          description: `You earned ${data.points_earned} wellness points`,
-        });
       }
 
       const badgeData = badgeResult.data as any;
@@ -152,22 +178,13 @@ const Exercises = () => {
         });
       }
 
-      setActiveExercise(null);
       await refreshProfile();
     } catch (error: any) {
       if (import.meta.env.DEV) console.error('Error completing exercise:', error);
-      
-      // User-friendly error messages
-      const errorMessage = error.message?.includes('wait') 
-        ? 'Please wait a moment before completing this exercise again'
-        : 'Failed to complete exercise. Please try again.';
-      
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
     }
+
+    setActiveExercise(null);
+    setSessionIntent('');
   };
 
   const activeExerciseData = exercises.find(e => e.id === activeExercise);
