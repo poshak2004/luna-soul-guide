@@ -10,11 +10,14 @@ import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { LunaCompanion } from "@/components/luna/LunaCompanion";
 import { useLuna } from "@/hooks/useLuna";
 import { DailyCheckInWidget } from "@/components/home/DailyCheckInWidget";
+import { useLocalStreak } from "@/hooks/useLocalStreak";
+import { StreakBanner } from "@/components/reinforcement/StreakBanner";
 
 const Dashboard = () => {
   const { entries } = useJournal();
   const { profile, userBadges, badges } = useGamification();
   const luna = useLuna();
+  const { streak, weeklyCount } = useLocalStreak();
 
   const stats = [
     { 
@@ -107,6 +110,16 @@ const Dashboard = () => {
             className="mb-8"
           >
             <DailyCheckInWidget />
+          </motion.div>
+
+          {/* Streak Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mb-8"
+          >
+            <StreakBanner streak={streak} weeklyCount={weeklyCount} />
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

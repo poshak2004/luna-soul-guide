@@ -11,6 +11,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { rpcWithRetry } from "@/lib/supabaseHelper";
+import { useLocalStreak } from "@/hooks/useLocalStreak";
+import { StreakBanner } from "@/components/reinforcement/StreakBanner";
+import { SessionIntent } from "@/components/reinforcement/SessionIntent";
+import { SessionReflection } from "@/components/reinforcement/SessionReflection";
 
 // Lazy load exercise components for better performance
 const BreatheSync = lazy(() => import("@/components/exercises/BreatheSync").then(m => ({ default: m.BreatheSync })));
@@ -21,9 +25,27 @@ const FocusSprint = lazy(() => import("@/components/exercises/FocusSprint").then
 
 const Exercises = () => {
   const [activeExercise, setActiveExercise] = useState<string | null>(null);
+  const [showIntent, setShowIntent] = useState(false);
+  const [pendingExercise, setPendingExercise] = useState<string | null>(null);
+  const [sessionIntent, setSessionIntent] = useState('');
+  const [showReflection, setShowReflection] = useState(false);
+  const [completedExerciseId, setCompletedExerciseId] = useState<string | null>(null);
   const { refreshProfile } = useGamification();
   const luna = useLuna();
   const { toast } = useToast();
+  const { streak, weeklyCount, recordSession } = useLocalStreak();
+
+  const handleExerciseClick = (exerciseId: string) => {
+    setPendingExercise(exerciseId);
+    setShowIntent(true);
+  };
+
+  const startExercise = (intent: string) => {
+    setSessionIntent(intent);
+    setShowIntent(false);
+    setActiveExercise(pendingExercise);
+    setPendingExercise(null);
+  };
 
   const exercises = [
     {
@@ -89,11 +111,43 @@ const Exercises = () => {
   ];
 
   const completeExercise = async (exerciseId: string) => {
+    // Show reflection first before finishing
+    setCompletedExerciseId(exerciseId);
+    setShowReflection(true);
+  };
+
+  const handleReflection = async (quality: 'focused' | 'distracted') => {
+    setShowReflection(false);
+    const exerciseId = completedExerciseId;
+    setCompletedExerciseId(null);
+
+    // Record streak
+    const streakResult = recordSession();
+    if (streakResult.increased) {
+      toast({
+        title: `🔥 Day ${streakResult.currentStreak} streak — don't break it!`,
+        description: sessionIntent ? `Focus: ${sessionIntent} • ${quality}` : `Session: ${quality}`,
+      });
+    } else if (streakResult.reset) {
+      toast({
+        title: '✨ New start — let\'s build consistency',
+        description: `Session: ${quality}. Every day counts.`,
+      });
+    } else {
+      toast({
+        title: `✅ Session complete`,
+        description: `Session: ${quality}. Streak: ${streakResult.currentStreak} days.`,
+      });
+    }
+
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setActiveExercise(null);
+      setSessionIntent('');
+      return;
+    }
 
     try {
-      // Map exercise IDs to database exercise types
       const exerciseTypeMap: Record<string, string> = {
         breathesync: 'breathing_exercise',
         reflectloop: 'meditation_exercise',
@@ -102,25 +156,19 @@ const Exercises = () => {
         mindmirror: 'meditation_exercise',
       };
 
-      // Use atomic RPC function
       const { data, error } = await rpcWithRetry<any>('complete_exercise_and_award', {
         _user_id: user.id,
-        _exercise_type: exerciseTypeMap[exerciseId] || 'breathing_exercise',
+        _exercise_type: exerciseTypeMap[exerciseId!] || 'breathing_exercise',
       });
 
       if (error) throw error;
 
-      // Check for new badges
       const badgeResult = await rpcWithRetry('check_and_award_badges', {
         _user_id: user.id,
       });
 
       if (data?.success) {
         luna.celebrate(`You earned ${data.points_earned} points`);
-        toast({
-          title: `🎉 +${data.points_earned} points!`,
-          description: `You earned ${data.points_earned} wellness points`,
-        });
       }
 
       const badgeData = badgeResult.data as any;
@@ -130,22 +178,13 @@ const Exercises = () => {
         });
       }
 
-      setActiveExercise(null);
       await refreshProfile();
     } catch (error: any) {
       if (import.meta.env.DEV) console.error('Error completing exercise:', error);
-      
-      // User-friendly error messages
-      const errorMessage = error.message?.includes('wait') 
-        ? 'Please wait a moment before completing this exercise again'
-        : 'Failed to complete exercise. Please try again.';
-      
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
     }
+
+    setActiveExercise(null);
+    setSessionIntent('');
   };
 
   const activeExerciseData = exercises.find(e => e.id === activeExercise);
@@ -180,6 +219,33 @@ const Exercises = () => {
                 </p>
               </motion.div>
 
+              {/* Streak Banner */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="max-w-7xl mx-auto mb-6"
+              >
+                <StreakBanner streak={streak} weeklyCount={weeklyCount} />
+              </motion.div>
+
+              {/* Session Intent */}
+              <AnimatePresence>
+                {showIntent && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="max-w-xl mx-auto mb-6"
+                  >
+                    <SessionIntent
+                      onSubmit={startExercise}
+                      onSkip={() => startExercise('General wellness')}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {/* Exercise Grid */}
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
                 {exercises.map((exercise, index) => (
@@ -195,7 +261,7 @@ const Exercises = () => {
                   >
                     <Card 
                       className="glass hover-lift cursor-pointer group h-full overflow-hidden relative border-2"
-                      onClick={() => setActiveExercise(exercise.id)}
+                      onClick={() => handleExerciseClick(exercise.id)}
                     >
                       {/* Background glow effect */}
                       <motion.div
@@ -278,12 +344,20 @@ const Exercises = () => {
                   </motion.div>
                 }
               >
-                {activeExerciseData && (
+                {showReflection ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="max-w-md mx-auto"
+                  >
+                    <SessionReflection onReflect={handleReflection} />
+                  </motion.div>
+                ) : activeExerciseData ? (
                   <activeExerciseData.component
                     onComplete={() => completeExercise(activeExercise)}
-                    onExit={() => setActiveExercise(null)}
+                    onExit={() => { setActiveExercise(null); setSessionIntent(''); }}
                   />
-                )}
+                ) : null}
               </Suspense>
             </AnimatePresence>
           )}
