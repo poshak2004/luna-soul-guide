@@ -10,6 +10,8 @@ import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { LunaCompanion } from "@/components/luna/LunaCompanion";
 import { useLuna } from "@/hooks/useLuna";
 import { DailyCheckInWidget } from "@/components/home/DailyCheckInWidget";
+import { useLocalStreak } from "@/hooks/useLocalStreak";
+import { StreakBanner } from "@/components/reinforcement/StreakBanner";
 
 const Dashboard = () => {
   const { entries } = useJournal();
