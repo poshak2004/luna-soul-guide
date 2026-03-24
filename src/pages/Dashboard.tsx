@@ -17,6 +17,7 @@ const Dashboard = () => {
   const { entries } = useJournal();
   const { profile, userBadges, badges } = useGamification();
   const luna = useLuna();
+  const { streak, weeklyCount } = useLocalStreak();
 
   const stats = [
     { 
