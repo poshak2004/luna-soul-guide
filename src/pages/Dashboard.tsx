@@ -112,6 +112,16 @@ const Dashboard = () => {
             <DailyCheckInWidget />
           </motion.div>
 
+          {/* Streak Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mb-8"
+          >
+            <StreakBanner streak={streak} weeklyCount={weeklyCount} />
+          </motion.div>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {stats.map((stat, idx) => (
               <motion.div 

@@ -344,12 +344,20 @@ const Exercises = () => {
                   </motion.div>
                 }
               >
-                {activeExerciseData && (
+                {showReflection ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="max-w-md mx-auto"
+                  >
+                    <SessionReflection onReflect={handleReflection} />
+                  </motion.div>
+                ) : activeExerciseData ? (
                   <activeExerciseData.component
                     onComplete={() => completeExercise(activeExercise)}
-                    onExit={() => setActiveExercise(null)}
+                    onExit={() => { setActiveExercise(null); setSessionIntent(''); }}
                   />
-                )}
+                ) : null}
               </Suspense>
             </AnimatePresence>
           )}
