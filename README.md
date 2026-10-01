@@ -1,65 +1,53 @@
-# Welcome to your Lovable project
+# Luna: AI Mental-Wellness Companion
 
-## Project info
+A full-stack wellness app built around **Luna**, an empathetic AI guide. It combines streaming chat, standardized self-assessments, mood tracking, journaling and guided exercises, with crisis resources one tap away.
 
-**URL**: https://lovable.dev/projects/8c001818-054d-4757-99a8-bce20b0e3d89
+> Luna is a self-help tool, **not** a substitute for professional care. The chat is instructed to point people in crisis to professional resources, and the app has a dedicated Crisis page (988, Crisis Text Line).
 
-## How can I edit this code?
+## Features
 
-**Use your preferred IDE**
+| Area | What's there |
+|---|---|
+| 💬 **Chat** | Streaming (SSE) conversations with Luna; input validation (1–50 messages); saved conversation history |
+| 📋 **Assessments** | PHQ-9, GAD-7, DASS-21 with scoring and LLM-written interpretations, plus deterministic fallback text when the model is unavailable |
+| 🙂 **Mood** | LLM mood analysis of free text via **structured tool-calling** (JSON schema), mood calendar, daily logs |
+| 📓 **Journal** | Editor, mood picker, AI-generated reflective prompts |
+| 🧘 **Exercises** | Therapy exercise library, LLM-personalized suggestions |
+| 📈 **Insights** | 30-day mood trends, AI weekly summaries, wellness reports |
+| 🎮 **Engagement** | Points, streaks, badges and a leaderboard, with real-time Supabase subscriptions |
+| 🎙 **Voice** | Voice companion with speech input |
+| 🎨 **Extras** | CogniArts (art-based reflection), sensory/sound healing with an admin sound manager |
+| 🆘 **Crisis** | Hotline directory always reachable from navigation |
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Architecture
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```
+React + TypeScript (Vite, shadcn-ui, Tailwind)
+   │  Supabase Auth · Postgres (RLS) · Realtime
+   ▼
+Supabase Edge Functions (Deno)
+   ├─ chat                       streaming SSE responses
+   ├─ analyze-mood               tool-calling → structured mood JSON
+   ├─ interpret-assessment       PHQ-9 / GAD-7 / DASS-21 interpretation + fallback
+   ├─ personalize-exercises
+   ├─ generate-journal-prompts
+   └─ generate-weekly-summary
+   ▼
+LLM: Gemini 2.5 Flash via an OpenAI-compatible gateway
+```
 
-Follow these steps:
+- **20+ Postgres tables** across 16 migrations (profiles, conversations, mood logs, assessments, journal, badges, activities…) with row-level security
+- Model keys live only in the edge functions; the client never sees them
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Run it
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+You'll need a Supabase project. Apply `supabase/migrations`, deploy `supabase/functions`, and set the gateway API key as a function secret.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/8c001818-054d-4757-99a8-bce20b0e3d89) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+<sub>Scaffolded with Lovable, then extended into a multi-feature app. Gamification details: <a href="INSIGHTS_GAMIFICATION_README.md">INSIGHTS_GAMIFICATION_README.md</a>.</sub>
